@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
 import { getMembers } from './api'
+import { Button } from './components/ui/button'
 
 const MemberList = () => {
   const { data } = useQuery({
@@ -8,9 +9,15 @@ const MemberList = () => {
     queryFn: getMembers,
   })
 
+  const onSubmit = (e) => {
+    console.log(e)
+  }
   return (
     <>
       <div>MemberList</div>
+      <Button variant="ghost" onSubmit={onSubmit}>
+        Download CSV
+      </Button>
       {data && (
         <ul>
           {data.docs.map((m) => (

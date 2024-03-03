@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -6,7 +5,6 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -28,8 +26,8 @@ export default function AddMember() {
       phone: '',
       address1: '',
       address2: '',
-      city: '',
-      state: '',
+      city: 'Vista',
+      state: 'CA',
       postalCode: null,
       lat: null,
       lng: null,
@@ -74,6 +72,7 @@ export default function AddMember() {
     )
     // save to firestore
     await saveMember(data)
+    form.reset()
   }
 
   if (Object.keys(form?.formState?.errors).length > 0) {
@@ -96,7 +95,6 @@ export default function AddMember() {
                 <FormControl>
                   <Input placeholder="Family name" {...field} />
                 </FormControl>
-                <FormDescription>Surname of the Family</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -110,7 +108,6 @@ export default function AddMember() {
                 <FormControl>
                   <Input placeholder="Name" {...field} />
                 </FormControl>
-                <FormDescription>Name of this member</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -124,7 +121,6 @@ export default function AddMember() {
                 <FormControl>
                   <Input placeholder="760-555-1212" {...field} />
                 </FormControl>
-                <FormDescription>Phone number of this member</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -138,7 +134,6 @@ export default function AddMember() {
                 <FormControl>
                   <Input placeholder="123 Street" {...field} />
                 </FormControl>
-                <FormDescription>Address line 1</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -152,7 +147,6 @@ export default function AddMember() {
                 <FormControl>
                   <Input placeholder="Apt 23" {...field} />
                 </FormControl>
-                <FormDescription>Address line 2</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -166,7 +160,6 @@ export default function AddMember() {
                 <FormControl>
                   <Input placeholder="Vista" {...field} />
                 </FormControl>
-                <FormDescription>Name of city</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -180,12 +173,13 @@ export default function AddMember() {
                 <FormControl>
                   <Input placeholder="CA" {...field} />
                 </FormControl>
-                <FormDescription>Name of the state</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button disabled={form.formState.isSubmitting} type="submit">
+            Submit
+          </Button>
         </form>
       </Form>
       <MemberList />

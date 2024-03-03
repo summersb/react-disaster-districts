@@ -8,6 +8,7 @@ import { EmailAuthProvider, GoogleAuthProvider } from 'firebase/auth'
 import StyledFirebaseAuth from './StyledFirebaseAuth'
 import useAuth from '@/hooks/useAuth'
 import { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar'
+import { ModeToggle } from './components/mode-toggle'
 
 const uiConfig = {
   // Popup sign in flow rather than redirect flow.
@@ -27,7 +28,8 @@ function App() {
 
   return (
     <div>
-      <Tabs defaultValue="districts" className="w-[400px]">
+      <ModeToggle />
+      <Tabs defaultValue="districts" className="w-full">
         <TabsList>
           <TabsTrigger value="districts">Districts</TabsTrigger>
           <TabsTrigger value="addmembers">Add Member</TabsTrigger>

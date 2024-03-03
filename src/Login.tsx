@@ -1,10 +1,10 @@
 import StyledFirebaseAuth from './StyledFirebaseAuth'
 import 'firebase/compat/auth'
-import React, { useEffect } from 'react'
-import { auth } from '~/api'
+import { useEffect } from 'react'
+import { auth } from '@/api'
 import { EmailAuthProvider, GoogleAuthProvider } from 'firebase/auth'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import useAuth from '~/hooks/useAuth'
+import { Navigate, useLocation } from 'react-router-dom'
+import useAuth from '@/hooks/useAuth'
 
 const uiConfig = {
   // Popup sign in flow rather than redirect flow.
@@ -20,17 +20,12 @@ const uiConfig = {
 
 const Login = () => {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || location.pathname
 
   useEffect(() => {
     document.title = 'Book Review - Login'
   }, [])
-
-  // if (user?.name) {
-  //   navigate(from, { replace: true })
-  // }
 
   console.log('Login', from, location.pathname)
   uiConfig.signInSuccessUrl = from
