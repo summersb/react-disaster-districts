@@ -1,17 +1,18 @@
 import { QuerySnapshot, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import { converter } from './converter'
 import { db } from "./firebase"
-import { Member } from '@/type/Member'
+import type { Member } from '@/type/Member'
 
-const memberCollectionName = "members"
+const wardDoc = `${import.meta.env.VITE_ward}`
+const topCollection = import.meta.env.VITE_top_collection
 
 const getMembers = async (): Promise<QuerySnapshot<Member>> => {
-  return await getDocs(collection(db, memberCollectionName).withConverter(converter<Member>()))
+  return await getDocs(collection(db, `${topCollection}/${wardDoc}/members`).withConverter(converter<Member>()))
 }
 
-const saveMember = async (id: string, member: Member): Promise<void> => {
-  const memberCollection = collection(db, memberCollectionName)
-  await setDoc(doc(memberCollection, id), {
+const saveMember = async (member: Member): Promise<void> => {
+  const memberCollection = collection(db, `${topCollection}/${wardDoc}/members`)
+  await setDoc(doc(memberCollection, `${member.familyName}-${member.name}`), {
     ...member
   })
 }

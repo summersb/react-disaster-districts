@@ -9,10 +9,8 @@ export default function Markers({ members }: Props) {
     <div>
       {members.map((member) => (
         <AdvancedMarker
-          position={
-            new google.maps.LatLng(member.location._lat, member.location._long)
-          }
-          key={member.id}
+          position={new google.maps.LatLng(member.lat, member.lng)}
+          key={member.familyName}
         >
           <span>🏠</span>
         </AdvancedMarker>

@@ -1,20 +1,21 @@
-import { GeoPoint } from "firebase/firestore"
 import { z } from "zod"
 
-
-const obj = z.object({
-  name: z.string(),
-  address: z.string(),
+export const schema = z.object({
+  id: z.string().uuid().nullable(),
+  familyName: z.string().min(1),
+  formattedAddress: z.string(),
+  name: z.string().min(1),
+  address1: z.string().min(1),
+  address2: z.string().nullable(),
+  city: z.string(),
+  state: z.string(),
+  postalCode: z.number().nullable(),
   phone: z.string(),
-  location: z.string(),
+  lat: z.number().nullable(),
+  lng: z.number().nullable(),
 })
 
-export interface Member {
-  name: string
-  address: string
-  phone: string
-  location: GeoPoint
-}
+export type Member = z.infer<typeof schema>
 
 export interface MemberRecord {
   id: string

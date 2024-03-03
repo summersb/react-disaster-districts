@@ -1,84 +1,194 @@
 import React from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-
-const schema = z.object({
-  name: z.string().min(1),
-  address: z.string().min(1),
-  phone: z.string(),
-  lat: z.string().nullable(),
-  lng: z.string().nullable(),
-})
-
-type Member = z.infer<typeof schema>
+import { saveMember } from './api'
+import MemberList from './MemberList'
+import { Member, Result } from './type'
+import { schema } from './type/Member'
 
 export default function AddMember() {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<Member>({
+  const form = useForm<Member>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      id: null,
+      familyName: '',
+      name: '',
+      formattedAddress: '',
+      phone: '',
+      address1: '',
+      address2: '',
+      city: '',
+      state: '',
+      postalCode: null,
+      lat: null,
+      lng: null,
+    },
   })
 
-  const onSubmit: SubmitHandler<Member> = (data) => {
-    // convert to firestore Member object
+  const resolveAddress = async (address: string): Promise<Result> =>
+    fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}`,
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json()
+        } else {
+          throw new Error('Error resolving ' + res.statusText)
+        }
+      })
+      .then((json) => {
+        if (json.status === 'OK') {
+          return json.results[0]
+        } else {
+          throw new Error('Could not resolve address' + address)
+        }
+      })
+      .catch((e) => {
+        alert(e.message)
+      })
+
+  const onSubmit: SubmitHandler<Member> = async (data) => {
+    const address = await resolveAddress(
+      `${data.address1},${data.address2 === '' ? '' : data.address2 + ','}${data.city},${data.state}`,
+    )
+
+    data.id = crypto.randomUUID()
+    data.formattedAddress = address.formatted_address
+    data.lat = address.geometry.location.lat
+    data.lng = address.geometry.location.lng
+    data.postalCode = parseInt(
+      address?.address_components?.find(
+        (addressComponent) => addressComponent.types[0] === 'postal_code',
+      )?.long_name ?? '0',
+    )
     // save to firestore
-    // show any errors
-    console.log(data)
+    await saveMember(data)
   }
 
-  //  const onSubmit: SubmitHandler<Member> = (data) => {
-  //    // get lat/lng from google
-  //    // add to firebase
-  //    // trigger map update
-  //    fetch(
-  //      `https://maps.googleapis.com/maps/api/geocode/json?address=${data.address}&key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}`,
-  //    )
-  //      .then((res) => {
-  //        if (res.ok) {
-  //          return res.json()
-  //        } else {
-  //          throw Error('Did not succeed ' + res.statusText)
-  //        }
-  //      })
-  //      .then((json) => {
-  //        if (json.status === 'OK') {
-  //          console.log(json)
-  //        }
-  //        if (json.status === 'ZERO_RESULTS') {
-  //          alert('No address found')
-  //        }
-  //      })
-  //      .catch((e: Error) => {
-  //        console.log(e.message)
-  //      })
-  //    console.log(data)
-  //  }
+  if (Object.keys(form?.formState?.errors).length > 0) {
+    console.log('Errors', form?.formState?.errors)
+  }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input {...register('name')} type="text" placeholder="name" />
-      {errors.name && <span>{errors.name.message}</span>}
-      <br />
-      <input
-        {...register('address')}
-        placeholder="123 My Street, City, State, Zip"
-      />
-      <br />
-      {errors.address && <span>{errors.address.message}</span>}
-      <input {...register('phone')} type="text" placeholder="phone" />
-      {errors.phone && <span>{errors.phone.message}</span>}
-      <br />
-      <input {...register('lat')} type="text" placeholder="lat" />
-      <br />
-      <input {...register('lng')} type="text" placeholder="lng" />
-      <br />
-      <button disabled={isSubmitting} type="submit">
-        {isSubmitting ? 'Saving' : 'Save'}
-      </button>
-    </form>
+    <>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-2/3 space-y-6"
+        >
+          <FormField
+            control={form.control}
+            name="familyName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Family Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Family name" {...field} />
+                </FormControl>
+                <FormDescription>Surname of the Family</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Name" {...field} />
+                </FormControl>
+                <FormDescription>Name of this member</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input placeholder="760-555-1212" {...field} />
+                </FormControl>
+                <FormDescription>Phone number of this member</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="address1"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Address</FormLabel>
+                <FormControl>
+                  <Input placeholder="123 Street" {...field} />
+                </FormControl>
+                <FormDescription>Address line 1</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="address2"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Address2</FormLabel>
+                <FormControl>
+                  <Input placeholder="Apt 23" {...field} />
+                </FormControl>
+                <FormDescription>Address line 2</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <FormControl>
+                  <Input placeholder="Vista" {...field} />
+                </FormControl>
+                <FormDescription>Name of city</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="state"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>State</FormLabel>
+                <FormControl>
+                  <Input placeholder="CA" {...field} />
+                </FormControl>
+                <FormDescription>Name of the state</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Submit</Button>
+        </form>
+      </Form>
+      <MemberList />
+    </>
   )
 }
