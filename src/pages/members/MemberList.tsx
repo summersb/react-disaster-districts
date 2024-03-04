@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
-import { getMembers } from './api'
-import { Button } from './components/ui/button'
+import { getMembers } from '../../api'
+import { Button } from '../../components/ui/button'
 
 const MemberList = () => {
   const { data } = useQuery({

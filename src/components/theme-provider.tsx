@@ -56,9 +56,6 @@ export function ThemeProvider({
     },
   }
 
-  console.log('Dark mode', theme)
-  
-
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       {children}

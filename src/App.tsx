@@ -1,60 +1,44 @@
-import React from 'react'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
-import AddMember from './AddMember'
-import Distrits from './Districts'
-import { auth } from '@/api'
-import MapDisplay from './MapDisplay'
-import { EmailAuthProvider, GoogleAuthProvider } from 'firebase/auth'
-import StyledFirebaseAuth from './StyledFirebaseAuth'
+import AddMember from './pages/members/AddMember'
+import MapDisplay from './pages/map/MapDisplay'
 import useAuth from '@/hooks/useAuth'
-import { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar'
-import { ModeToggle } from './components/mode-toggle'
-
-const uiConfig = {
-  // Popup sign in flow rather than redirect flow.
-  signInFlow: 'popup',
-  // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  signInSuccessUrl: '/Home',
-  // We will display Google and Facebook as auth providers.
-  signInOptions: [
-    EmailAuthProvider.PROVIDER_ID,
-    GoogleAuthProvider.PROVIDER_ID,
-  ],
-}
+import { Routes, Route } from 'react-router-dom'
+import Layout from './pages/nav/Layout'
+import Districts from './pages/districts/Districts'
+import Home from './pages/home/Home'
+import RequireAuth from './components/RequireAuth'
+import Login from './pages/home/Login'
+import { auth } from '@/api'
+import { useEffect } from 'react'
+import MemberList from './pages/members/MemberList'
 
 function App() {
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
   console.log('user', user)
 
+  useEffect(() => {
+    return auth.onAuthStateChanged((user) => {
+      if (user != null) {
+        setUser({ name: user.displayName, photoURL: user.photoURL })
+      } else {
+        setUser({})
+      }
+    })
+  }, [])
+
   return (
-    <div>
-      <ModeToggle />
-      <Tabs defaultValue="districts" className="w-full">
-        <TabsList>
-          <TabsTrigger value="districts">Districts</TabsTrigger>
-          <TabsTrigger value="addmembers">Add Member</TabsTrigger>
-          <TabsTrigger value="map">View Map</TabsTrigger>
-          <TabsTrigger value="login">Login</TabsTrigger>
-        </TabsList>
-        <TabsContent value="districts">
-          <Distrits />
-        </TabsContent>
-        <TabsContent value="addmembers">
-          <AddMember />
-        </TabsContent>
-        <TabsContent value="map">
-          <MapDisplay />
-        </TabsContent>
-        <TabsContent value="login">
-          <Avatar>
-            <AvatarImage src={user.photoURL} />
-            <AvatarFallback>
-              <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
-            </AvatarFallback>
-          </Avatar>
-        </TabsContent>
-      </Tabs>
-    </div>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route path="home" element={<Home />} />
+        <Route path="login" element={<Login />} />
+        <Route element={<RequireAuth />}>
+          <Route path="districts" element={<Districts />} />
+          <Route path="members" element={<MemberList />} />
+          <Route path="addmember" element={<AddMember />} />
+          <Route path="map" element={<MapDisplay />} />
+        </Route>
+        <Route path="*" element={<Home />} />
+      </Route>
+    </Routes>
   )
 }
 

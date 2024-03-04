@@ -1,4 +1,4 @@
-import React, { Context, createContext, useState } from 'react'
+import React, { createContext, useState } from 'react'
 
 export type UserType = {
   name?: string | null
@@ -15,7 +15,9 @@ const AuthContext = createContext<UserContextType>({})
 type AuthProviderType = {
   children: React.ReactElement
 }
-export const AuthProvider = ({ children }: AuthProviderType): JSX.Element => {
+export const AuthProvider = ({
+  children,
+}: AuthProviderType): React.ReactElement => {
   const [user, setUser] = useState<UserType>({})
 
   return (

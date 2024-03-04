@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
+import { log } from 'console'
 
 interface Props {
   // The Firebase UI Web UI Config object.
@@ -31,10 +32,12 @@ const StyledFirebaseAuth = ({
     const firebaseUiWidget =
       firebaseui.auth.AuthUI.getInstance() ||
       new firebaseui.auth.AuthUI(firebaseAuth)
+    console.log('uiwidget', firebaseUiWidget)
     if (uiConfig.signInFlow === 'popup') firebaseUiWidget.reset()
 
     // We track the auth state to reset firebaseUi if the user signs out.
     const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
+      console.log('auth changed', user)
       if (!user && userSignedIn) firebaseUiWidget.reset()
       setUserSignedIn(!!user)
     })

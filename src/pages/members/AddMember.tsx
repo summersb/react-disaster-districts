@@ -10,10 +10,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { saveMember } from './api'
-import MemberList from './MemberList'
-import { Member, Result } from './type'
-import { schema } from './type/Member'
+import { saveMember } from '../../api'
+import { Member, Result } from '../../type'
+import { schema } from '../../type/Member'
 
 export default function AddMember() {
   const form = useForm<Member>({
@@ -182,7 +181,6 @@ export default function AddMember() {
           </Button>
         </form>
       </Form>
-      <MemberList />
     </>
   )
 }

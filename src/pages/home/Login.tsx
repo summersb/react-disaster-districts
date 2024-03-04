@@ -1,4 +1,4 @@
-import StyledFirebaseAuth from './StyledFirebaseAuth'
+import StyledFirebaseAuth from '../../StyledFirebaseAuth'
 import 'firebase/compat/auth'
 import { useEffect } from 'react'
 import { auth } from '@/api'
@@ -10,7 +10,7 @@ const uiConfig = {
   // Popup sign in flow rather than redirect flow.
   signInFlow: 'popup',
   // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  signInSuccessUrl: '/Home',
+  signInSuccessUrl: '/home',
   // We will display Google and Facebook as auth providers.
   signInOptions: [
     EmailAuthProvider.PROVIDER_ID,
@@ -24,18 +24,15 @@ const Login = () => {
   const from = location.state?.from?.pathname || location.pathname
 
   useEffect(() => {
-    document.title = 'Book Review - Login'
+    document.title = 'Disaster Districts - Login'
   }, [])
 
-  console.log('Login', from, location.pathname)
   uiConfig.signInSuccessUrl = from
 
   return (
-    <div>
+    <div className="h-screen flex flex-col items-center justify-center">
       {user?.name && <Navigate to={from} />}
-      <center>
-        <p>Please sign-in:</p>
-      </center>
+      <p>Please sign-in:</p>
       <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
     </div>
   )

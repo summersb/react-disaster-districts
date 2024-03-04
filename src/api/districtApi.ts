@@ -1,7 +1,7 @@
 import { QuerySnapshot, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import { converter } from './converter'
 import { db } from "./firebase"
-import type { District } from '~/type'
+import type { District } from '@/type'
 
 const districtCollectionName = "districts"
 
@@ -13,7 +13,7 @@ const createDistrict = async (id: string, name: string): Promise<void> => {
   const district: District = {
     id,
     name,
-    memberst: []
+    members: []
   }
 
   const districtCollection = collection(db, districtCollectionName)

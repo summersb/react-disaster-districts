@@ -1,7 +1,7 @@
 import React from 'react'
 import District from './District'
 
-export default function Distrits() {
+export default function Districts() {
   return (
     <div>
       <District />

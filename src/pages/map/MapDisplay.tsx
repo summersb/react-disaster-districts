@@ -2,7 +2,7 @@ import { APIProvider, Map } from '@vis.gl/react-google-maps'
 import { useQuery } from '@tanstack/react-query'
 import Markers from './Markers'
 import React from 'react'
-import { getMembers } from './api'
+import { getMembers } from '../../api'
 
 const MapDisplay = () => {
   const { data, isError, error } = useQuery({
