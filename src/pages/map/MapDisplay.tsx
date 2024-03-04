@@ -17,8 +17,6 @@ const MapDisplay = () => {
 
   const m = data?.docs.map((d) => d.data())
 
-  console.log(m)
-
   return (
     <div style={{ height: '100vh' }}>
       <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>

@@ -10,10 +10,10 @@ import Login from './pages/home/Login'
 import { auth } from '@/api'
 import { useEffect } from 'react'
 import MemberList from './pages/members/MemberList'
+import Settings from './pages/settings/Settings'
 
 function App() {
-  const { user, setUser } = useAuth()
-  console.log('user', user)
+  const { setUser } = useAuth()
 
   useEffect(() => {
     return auth.onAuthStateChanged((user) => {
@@ -35,6 +35,7 @@ function App() {
           <Route path="members" element={<MemberList />} />
           <Route path="addmember" element={<AddMember />} />
           <Route path="map" element={<MapDisplay />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Home />} />
       </Route>

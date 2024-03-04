@@ -74,10 +74,6 @@ export default function AddMember() {
     form.reset()
   }
 
-  if (Object.keys(form?.formState?.errors).length > 0) {
-    console.log('Errors', form?.formState?.errors)
-  }
-
   return (
     <>
       <Form {...form}>
@@ -176,7 +172,11 @@ export default function AddMember() {
               </FormItem>
             )}
           />
-          <Button disabled={form.formState.isSubmitting} type="submit">
+          <Button
+            variant="outline"
+            disabled={form.formState.isSubmitting}
+            type="submit"
+          >
             Submit
           </Button>
         </form>

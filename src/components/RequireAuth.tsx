@@ -5,7 +5,6 @@ import useAuth from '@/hooks/useAuth'
 const RequireAuth = (): React.ReactElement => {
   const { user } = useAuth()
   const location = useLocation()
-  console.log('RequireAuth', user, location)
   return user?.name ? (
     <Outlet />
   ) : (
