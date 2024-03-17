@@ -22,4 +22,9 @@ export interface MemberRecord {
   member: Member
 }
 
+export type Changed = {
+  old: Member
+  updated: Member
+}
+
 export type MemberMap = Record<string, string>

@@ -1,4 +1,4 @@
 import { db, app, auth } from './firebase'
-import { getMembers, saveMember } from './memberApi'
+import { getMembers, saveMember, deleteMember } from './memberApi'
 
-export { db, app, auth, getMembers, saveMember }
+export { db, app, auth, getMembers, saveMember, deleteMember }

@@ -1,4 +1,12 @@
-import { Map, School, School2, Settings, User, Users } from 'lucide-react'
+import {
+  HardDriveUpload,
+  Map,
+  School,
+  School2,
+  Settings,
+  User,
+  Users,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import useAuth from '@/hooks/useAuth'
@@ -34,6 +42,12 @@ const Sidebar = () => {
       </div>
       <div className="flex flex-row">
         <User /> <Link to="/addmember">Add/Update Members</Link>
+      </div>
+      <div className="flex flex-row">
+        <HardDriveUpload /> <Link to="/upload">Upload Members</Link>
+      </div>
+      <div className="flex flex-row">
+        <HardDriveUpload /> <Link to="/fakedata">Fake Data</Link>
       </div>
       <div className="flex flex-row grow">
         <Map />

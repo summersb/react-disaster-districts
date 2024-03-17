@@ -1,4 +1,4 @@
-import { QuerySnapshot, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
+import { QuerySnapshot, collection, doc, getDoc, getDocs, setDoc, deleteDoc } from 'firebase/firestore'
 import { converter } from './converter'
 import { db } from "./firebase"
 import type { Member } from '@/type/Member'
@@ -17,4 +17,8 @@ const saveMember = async (member: Member): Promise<void> => {
   })
 }
 
-export { getMembers, saveMember }
+const deleteMember = async (id: string): Promise<void> => {
+  return deleteDoc(doc(db, `${topCollection}/${wardDoc}/members`, id))
+}
+
+export { getMembers, saveMember, deleteMember }
