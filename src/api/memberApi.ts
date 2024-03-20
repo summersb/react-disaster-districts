@@ -1,4 +1,4 @@
-import { QuerySnapshot, collection, doc, getDoc, getDocs, setDoc, deleteDoc } from 'firebase/firestore'
+import { QuerySnapshot, collection, doc, getDocs, setDoc, deleteDoc } from 'firebase/firestore'
 import { converter } from './converter'
 import { db } from "./firebase"
 import type { Member } from '@/type/Member'

@@ -4,7 +4,7 @@ import { Member } from '@/type'
 
 const AddFakeMember = () => {
   const loadData = async () => {
-    const json = await fetch('https://randomuser.me/api/?results=10', {
+    const json = await fetch('https://randomuser.me/api/?results=5', {
       headers: {
         'Content-type': 'application/json',
       },

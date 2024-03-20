@@ -10,13 +10,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { saveMember } from '../../api'
-import { Member, Result } from '../../type'
-import { schema } from '../../type/Member'
+import { saveMember } from '@/api'
+import type { Member, Result } from '@/type'
+import { MemberSchema } from '@/type'
 
 export default function AddMember() {
   const form = useForm<Member>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(MemberSchema),
     defaultValues: {
       id: null,
       familyName: '',
@@ -76,6 +76,7 @@ export default function AddMember() {
 
   return (
     <>
+      <div className="text-xl flex justify-around">Add Member</div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

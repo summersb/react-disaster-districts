@@ -29,7 +29,7 @@ const MembersUpdate = ({ members }: MembersProps): React.ReactElement => {
         <TableBody>
           {members.map((m) => {
             return (
-              <TableRow key={m.old.id}>
+              <TableRow key={m.old.id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <TableCell>
                   {m.old.familyName}|{m.updated.familyName}
                 </TableCell>

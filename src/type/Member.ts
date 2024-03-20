@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const schema = z.object({
+export const MemberSchema = z.object({
   id: z.string().uuid().nullable(),
   familyName: z.string().min(1),
   formattedAddress: z.string(),
@@ -15,7 +15,7 @@ export const schema = z.object({
   lng: z.number().nullable(),
 })
 
-export type Member = z.infer<typeof schema>
+export type Member = z.infer<typeof MemberSchema>
 
 export interface MemberRecord {
   id: string

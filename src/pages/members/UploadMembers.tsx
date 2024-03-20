@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import Members from './Members'
 import MembersUpdate from './MembersUpdate'
+import {Button} from "@/components/ui/button.tsx";
 
 const UploadMembers = () => {
   const [file, setFile] = useState()
@@ -99,29 +100,48 @@ const UploadMembers = () => {
 
   return (
     <div className="p-4">
-      <form>
-        <input
-          type={'file'}
-          id={'csvFileInput'}
-          accept={'.csv'}
-          onChange={handleOnChange}
-        />
+      <div className="text-xl flex justify-around">Upload Member CSV</div>
+      {(members?.length ?? 0) === 0 && (
 
-        <button
-          onClick={(e) => {
-            handleOnSubmit(e)
-          }}
-        >
-          IMPORT CSV
-        </button>
-      </form>
-      <br />
-      New members
-      <Members members={newMembers} />
-      Changed Members
-      <MembersUpdate members={changedMembers} />
-      Removed Members
-      <Members members={removedMembers} />
+        <div className="flex justify-start">
+          <form>
+            <input
+              type={'file'}
+              id={'csvFileInput'}
+              accept={'.csv'}
+              onChange={handleOnChange}
+            />
+
+            <button
+              className="p-2 mr-4 rounded outline outline-offset-2"
+              onClick={(e) => {
+                handleOnSubmit(e)
+              }}
+            >
+              IMPORT CSV
+            </button>
+          </form></div>
+      )}
+      {(newMembers.length ?? 0) > 0 && (
+        <>
+          New members
+          <Members members={newMembers} />
+        </>
+      )}
+      {(changedMembers.length ?? 0) > 0 && (
+        <>
+          Changed Members
+          <MembersUpdate members={changedMembers} />
+        </>
+      )}
+      {(removedMembers.length ?? 0) > 0 && (
+        <>
+          Removed Members
+          <Members members={removedMembers} />
+        </>)}
+      {(members?.length ?? 0) > 0 && (
+        <Button onClick={() => setMembers([])} className="p-2 mr-4 rounded outline outline-offset-2">Cancel</Button>
+      )}
     </div>
   )
 }

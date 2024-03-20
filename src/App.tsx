@@ -13,6 +13,7 @@ import MemberList from './pages/members/MemberList'
 import Settings from './pages/settings/Settings'
 import UploadMembers from './pages/members/UploadMembers'
 import AddFakeMember from './pages/members/AddFakeMember'
+import AddDistrict from "@/pages/districts/AddDistrict.tsx";
 
 function App() {
   const { setUser } = useAuth()
@@ -34,6 +35,7 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route element={<RequireAuth />}>
           <Route path="districts" element={<Districts />} />
+          <Route path="adddistrict" element={<AddDistrict />} />
           <Route path="members" element={<MemberList />} />
           <Route path="addmember" element={<AddMember />} />
           <Route path="upload" element={<UploadMembers />} />
