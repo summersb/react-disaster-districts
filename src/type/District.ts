@@ -1,10 +1,12 @@
-import {z} from "zod";
+import { z } from "zod";
+import { MemberSchema } from "./Member"
 
 export const DistrictSchema = z.object({
   id: z.string(),
   name: z.string(),
-  leaderId: z.string(),
-  membersIds: z.string().array(),
+  leader: MemberSchema,
+  assistant: MemberSchema,
+  members: z.array(MemberSchema),
 })
 
 export type District = z.infer<typeof DistrictSchema>

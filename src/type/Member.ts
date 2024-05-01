@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const MemberSchema = z.object({
-  id: z.string().uuid().nullable(),
+  id: z.string().uuid(),
   familyName: z.string().min(1),
   formattedAddress: z.string(),
   name: z.string().min(1),

@@ -1,4 +1,4 @@
-import {Button} from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -7,31 +7,30 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
-import {zodResolver} from "@hookform/resolvers/zod"
-import {SubmitHandler, useForm} from "react-hook-form"
-import type {District, Member} from "@/type"
-import {DistrictSchema} from "@/type"
+import MapDisplay from '@/pages/map/MapDisplay'
+import { Input } from "@/components/ui/input"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { SubmitHandler, useForm } from "react-hook-form"
+import type { District, Member } from "@/type"
+import { DistrictSchema } from "@/type"
 import React, { useState } from 'react'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
-  CommandList, CommandSeparator
+  CommandList
 } from "@/components/ui/command"
-import {CommandInput} from "@/components/ui/command"
-import {
-  CaretSortIcon, CheckIcon
-} from "@radix-ui/react-icons";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
-import {useQuery} from "@tanstack/react-query"
-import {getMembers} from "@/api"
-import {cn} from "@/lib/utils.ts"
+import { CommandInput } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useQuery } from "@tanstack/react-query"
+import { getMembers } from "@/api"
+import { cn } from "@/lib/utils"
+import { Check, ChevronsUpDown } from "lucide-react"
 
 const AddDistrict = (): React.ReactElement => {
-  const [open, setOpen] = useState(false)
-  const [leader, setLeader] = React.useState("")
+  const [openLeader, setOpenLeader] = useState(false)
+  const [openAssistant, setOpenAssistant] = useState(false)
 
   const { data } = useQuery({
     queryKey: ['members'],
@@ -43,107 +42,193 @@ const AddDistrict = (): React.ReactElement => {
     defaultValues: {
       id: '',
       name: '',
-      leaderId: '',
-      membersIds: []
+      leader: {},
+      assistant: {},
+      members: []
     }
   })
 
+  const leader = form.getValues("leader")
+  const assistant = form.getValues("assistant")
+
   const onSubmit: SubmitHandler<District> = async (data) => {
-     console.log("Data", data)
-
-
+    console.log("Data", data)
   }
 
-  if(Object.keys(form.formState.errors).length > 0) {
+  if (Object.keys(form.formState.errors).length > 0) {
     console.log("errors", form.formState.errors)
   }
 
-  const memberList: Member[] = data?.docs.map((d) => d.data())
+  const memberList: Member[] = data?.docs.map((d) => d.data()) ?? []
 
   return (
-    <>
-      <div className="text-xl flex justify-around">Add District</div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>District Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="District name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="leaderId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Leader Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Leader name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-[200px] justify-between"
+    <div className="h-full bg-gray-100 flex flex-col items-center justify-center">
+      <div className="w-full bg-white rounded p-6 shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Create District</h2>
+
+        <Form {...form}>
+
+          <form action="#"
+            onSubmit={form.handleSubmit(onSubmit)}
+            method="POST">
+            <div className="text-gray-700 mb-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>District Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="District name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="text-gray-700 mb-4">
+              <FormLabel>Leader</FormLabel>
+              <Popover open={openLeader} onOpenChange={setOpenLeader}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                  >
+                    {leader.id ? (
+                      <>
+                        {`${leader.familyName}, ${leader.name}`}
+                      </>
+                    ) : (
+                      <>Select district leader</>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" side="bottom" align="start">
+                  <Command>
+                    <CommandInput placeholder="Leader" />
+                    <CommandEmpty>No results found.</CommandEmpty>
+                    <CommandList>
+                      <CommandGroup>
+                        {memberList?.filter(m => m.id !== assistant.id ?? "").map((member) => (
+                          <CommandItem
+                            key={member.id}
+                            value={member.id}
+                            keywords={[member.familyName, member.name, member.formattedAddress]}
+                            onSelect={() => {
+                              form.setValue('leader', member)
+                              setOpenLeader(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                leader.id === member.id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            <span>{member.familyName}, {member.name}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="text-gray-700 mb-4">
+              <FormLabel>Assistant Leader</FormLabel>
+              <Popover open={openAssistant} onOpenChange={setOpenAssistant}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                  >
+                    {assistant.id ? (
+                      <>
+                        {`${assistant.familyName}, ${assistant.name}`}
+                      </>
+                    ) : (
+                      <>Select district assistant leader</>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" side="bottom" align="start">
+                  <Command>
+                    <CommandInput placeholder="Assistant Leader" />
+                    <CommandEmpty>No results found.</CommandEmpty>
+                    <CommandList>
+                      <CommandGroup>
+                        {memberList?.filter(m => m.id !== leader?.id ?? "").map((member) => (
+                          <CommandItem
+                            key={member.id}
+                            value={member.id}
+                            keywords={[member.familyName, member.name, member.formattedAddress]}
+                            onSelect={() => {
+                              form.setValue('assistant', member)
+                              setOpenAssistant(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                assistant.id === member.id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            <span>{member.familyName}, {member.name}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="flex text-gray-700 mb-4">
+              <div className="w-1/2 mr-2">
+                <label htmlFor="districtMembers" className="block text-gray-700 font-bold mb-2">
+                  Members
+                </label>
+              </div>
+              <div className="w-1/2 mr-2">
+                <label htmlFor="map" className="block text-gray-700 font-bold mb-2">
+                  Map
+                </label>
+              </div>
+            </div>
+
+            <div className="flex text-gray-700 mb-4 h-[500px]">
+              <div className="w-1/2 mr-2">
+                <textarea
+                  id="districtMembers"
+                  name="districtMembers"
+                  className="w-full px-3 py-2 border rounded-md text-gray-700 h-full resize-none focus:outline-none focus:border-blue-500"
+                  placeholder="Add from map"
+                ></textarea>
+              </div>
+              <div className="w-1/2 ml-2">
+                <MapDisplay lat={leader?.lat ?? 33.1928423} lng ={leader?.lng ?? -117.2413057}/>
+              </div>
+            </div>
+
+            <div className="text-gray-700 mb-4">
+              <button
+                type="submit"
+                className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
-                {leader ? leader : "Select leader ..."}
-                <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command className="rounded-lg border shadow-md">
-                <CommandInput placeholder="Type a command or search..." />
-                <CommandList>
-                  <CommandEmpty>No results found.</CommandEmpty>
-                  <CommandGroup heading="Suggestions">
-                    {memberList?.map((member) => (
-                      <CommandItem
-                        key={member.id}
-                        value={member.familyName}
-                        onSelect={(currentValue) => {
-                          setLeader(currentValue === leader ? "" : currentValue)
-                          setOpen(false)
-                        }}
-                      >
-                        {member.familyName}
-                        <CheckIcon
-                          className={cn(
-                            "ml-auto h-4 w-4",
-                            leader === member.id ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                  <CommandSeparator />
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <Button
-            variant="outline"
-            disabled={form.formState.isSubmitting}
-            type="submit"
-          >
-            Submit
-          </Button>
-        </form>
-      </Form>
-      Add Member to District
-    </>
+                Submit
+              </button>
+            </div>
+
+          </form>
+        </Form>
+      </div>
+    </div>
   )
 }
 

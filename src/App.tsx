@@ -40,7 +40,7 @@ function App() {
           <Route path="addmember" element={<AddMember />} />
           <Route path="upload" element={<UploadMembers />} />
           <Route path="fakedata" element={<AddFakeMember />} />
-          <Route path="map" element={<MapDisplay />} />
+          <Route path="map" element={ <div className="h-screen" > <MapDisplay /> </div> } /> 
           <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Home />} />

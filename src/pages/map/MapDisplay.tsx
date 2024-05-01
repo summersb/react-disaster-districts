@@ -4,7 +4,12 @@ import Markers from './Markers'
 import React from 'react'
 import { getMembers } from '../../api'
 
-const MapDisplay = () => {
+type MapDisplayProps = {
+  lat?: number
+  lng?: number
+}
+
+const MapDisplay = ({lat = 33.1928423, lng = -117.2413057}: MapDisplayProps): React.ReactElement => {
   const { data, isError, error } = useQuery({
     queryKey: ['Members'],
     queryFn: getMembers,
@@ -15,13 +20,15 @@ const MapDisplay = () => {
     alert(error)
   }
 
+  console.log("MapDisplay loading", lat, lng);
+
   const m = data?.docs.map((d) => d.data())
 
   return (
-    <div style={{ height: '100vh' }}>
+    <div className="h-full">
       <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>
         <Map
-          defaultCenter={{ lat: 33.1928423, lng: -117.2413057 }}
+          center={{ lat, lng }}
           defaultZoom={15}
           mapId={import.meta.env.VITE_MAP_ID}
         >

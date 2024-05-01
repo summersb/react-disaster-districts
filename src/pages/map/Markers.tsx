@@ -1,6 +1,5 @@
 import { AdvancedMarker } from '@vis.gl/react-google-maps'
 import type { Member } from '@/type/index'
-import React from 'react'
 
 type Props = { members: Member[] }
 
