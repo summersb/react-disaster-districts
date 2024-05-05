@@ -13,7 +13,7 @@ type MembersProps = {
   members: Member[]
 }
 
-const Members = ({ members }: MembersProps): React.ReactElement => {
+const UploadMembersDetail = ({ members }: MembersProps): React.ReactElement => {
   return (
     <>
       <Table>
@@ -43,4 +43,4 @@ const Members = ({ members }: MembersProps): React.ReactElement => {
   )
 }
 
-export default Members
+export default UploadMembersDetail

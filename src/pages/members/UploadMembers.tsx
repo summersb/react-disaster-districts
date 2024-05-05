@@ -2,7 +2,7 @@ import { getMembers } from '@/api'
 import type { Member } from '@/type'
 import { useQuery } from '@tanstack/react-query'
 import React, { useState } from 'react'
-import Members from './Members'
+import UploadMembersDetail from './UploadMembersDetail'
 import MembersUpdate from './MembersUpdate'
 import {Button} from "@/components/ui/button.tsx";
 
@@ -125,7 +125,7 @@ const UploadMembers = () => {
       {(newMembers.length ?? 0) > 0 && (
         <>
           New members
-          <Members members={newMembers} />
+          <UploadMembersDetail members={newMembers} />
         </>
       )}
       {(changedMembers.length ?? 0) > 0 && (
@@ -137,7 +137,7 @@ const UploadMembers = () => {
       {(removedMembers.length ?? 0) > 0 && (
         <>
           Removed Members
-          <Members members={removedMembers} />
+          <UploadMembersDetail members={removedMembers} />
         </>)}
       {(members?.length ?? 0) > 0 && (
         <Button onClick={() => setMembers([])} className="p-2 mr-4 rounded outline outline-offset-2">Cancel</Button>

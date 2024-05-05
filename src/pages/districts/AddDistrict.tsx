@@ -24,7 +24,7 @@ import {
 import { CommandInput } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useQuery } from "@tanstack/react-query"
-import { getMembers } from "@/api"
+import { getMember, getMembers, createDistrict } from "@/api"
 import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
 
@@ -40,10 +40,10 @@ const AddDistrict = (): React.ReactElement => {
   const form = useForm<District>({
     resolver: zodResolver(DistrictSchema),
     defaultValues: {
-      id: '',
-      name: '',
-      leader: {},
-      assistant: {},
+      id: undefined,
+      name: undefined,
+      leader: undefined,
+      assistant: undefined,
       members: []
     }
   })
@@ -52,8 +52,26 @@ const AddDistrict = (): React.ReactElement => {
   const assistant = form.getValues("assistant")
 
   const onSubmit: SubmitHandler<District> = async (data) => {
-    console.log("Data", data)
+    createDistrict(data)
+      .then(d => {
+        console.log("created", d)
+        form.setValue("id", d.id)
+//        if(d.assistantId) {
+//          const m = getMember(d.assistantId)
+//          if (m != null) {
+//            form.setValue("assistant",  m)
+//          }
+//        }
+        // need to update the rest of  the form data with what came back from the db
+      })
+      .catch(err => {
+        form.setError("name", {
+          type:'custom',
+          message: err.message
+        })
+      })
   }
+  console.log("Data", form.getValues())
 
   if (Object.keys(form.formState.errors).length > 0) {
     console.log("errors", form.formState.errors)
@@ -88,7 +106,7 @@ const AddDistrict = (): React.ReactElement => {
             </div>
 
             <div className="text-gray-700 mb-4">
-              <FormLabel>Leader</FormLabel>
+              <FormLabel className={cn(form.formState.errors.leader && "text-destructive")} >Leader</FormLabel>
               <Popover open={openLeader} onOpenChange={setOpenLeader}>
                 <PopoverTrigger asChild>
                   <Button
@@ -96,7 +114,7 @@ const AddDistrict = (): React.ReactElement => {
                     size="sm"
                     className="w-full justify-start"
                   >
-                    {leader.id ? (
+                    {leader?.id ? (
                       <>
                         {`${leader.familyName}, ${leader.name}`}
                       </>
@@ -112,7 +130,7 @@ const AddDistrict = (): React.ReactElement => {
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandList>
                       <CommandGroup>
-                        {memberList?.filter(m => m.id !== assistant.id ?? "").map((member) => (
+                        {memberList?.filter(m => m.id !== assistant?.id ?? "").map((member) => (
                           <CommandItem
                             key={member.id}
                             value={member.id}
@@ -125,7 +143,7 @@ const AddDistrict = (): React.ReactElement => {
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                leader.id === member.id ? "opacity-100" : "opacity-0"
+                                leader?.id === member.id ? "opacity-100" : "opacity-0"
                               )}
                             />
                             <span>{member.familyName}, {member.name}</span>
@@ -136,6 +154,7 @@ const AddDistrict = (): React.ReactElement => {
                   </Command>
                 </PopoverContent>
               </Popover>
+              {form.formState.errors.leader && <div className="text-sm font-medium text-destructive">Leader must be selected</div>}
             </div>
 
             <div className="text-gray-700 mb-4">
@@ -147,7 +166,7 @@ const AddDistrict = (): React.ReactElement => {
                     size="sm"
                     className="w-full justify-start"
                   >
-                    {assistant.id ? (
+                    {assistant?.id ? (
                       <>
                         {`${assistant.familyName}, ${assistant.name}`}
                       </>
@@ -176,7 +195,7 @@ const AddDistrict = (): React.ReactElement => {
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                assistant.id === member.id ? "opacity-100" : "opacity-0"
+                                assistant?.id === member.id ? "opacity-100" : "opacity-0"
                               )}
                             />
                             <span>{member.familyName}, {member.name}</span>

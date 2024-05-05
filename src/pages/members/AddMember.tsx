@@ -18,7 +18,7 @@ export default function AddMember() {
   const form = useForm<Member>({
     resolver: zodResolver(MemberSchema),
     defaultValues: {
-      id: null,
+      id: crypto.randomUUID(),
       familyName: '',
       name: '',
       formattedAddress: '',
@@ -60,7 +60,6 @@ export default function AddMember() {
       `${data.address1},${data.address2 === '' ? '' : data.address2 + ','}${data.city},${data.state}`,
     )
 
-    data.id = crypto.randomUUID()
     data.formattedAddress = address.formatted_address
     data.lat = address.geometry.location.lat
     data.lng = address.geometry.location.lng

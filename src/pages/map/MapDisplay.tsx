@@ -9,7 +9,7 @@ type MapDisplayProps = {
   lng?: number
 }
 
-const MapDisplay = ({lat = 33.1928423, lng = -117.2413057}: MapDisplayProps): React.ReactElement => {
+const MapDisplay = ({ lat = 33.1928423, lng = -117.2413057 }: MapDisplayProps): React.ReactElement => {
   const { data, isError, error } = useQuery({
     queryKey: ['Members'],
     queryFn: getMembers,
@@ -20,7 +20,7 @@ const MapDisplay = ({lat = 33.1928423, lng = -117.2413057}: MapDisplayProps): Re
     alert(error)
   }
 
-  console.log("MapDisplay loading", lat, lng);
+  //  console.log("MapDisplay loading", lat, lng);
 
   const m = data?.docs.map((d) => d.data())
 

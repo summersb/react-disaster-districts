@@ -1,34 +1,48 @@
-import { QuerySnapshot, collection, doc, getDocs, setDoc } from 'firebase/firestore'
+import { QuerySnapshot, collection, doc, getDocs, setDoc, query, where } from 'firebase/firestore'
 import { converter } from './converter'
 import { db } from "./firebase"
-import type { District } from '@/type'
+import type { District, DistrictDbType } from '@/type'
 
 const wardDoc = `${import.meta.env.VITE_ward}`
 const topCollection = import.meta.env.VITE_top_collection
 
-const getDistrict = async (): Promise<QuerySnapshot<District>> => {
-  return await getDocs(collection(db, `${topCollection}/${wardDoc}/districts`).withConverter(converter<District>()))
+const getDistricts = async (): Promise<QuerySnapshot<DistrictDbType>> => {
+  return await getDocs(collection(db, `${topCollection}/${wardDoc}/districts`).withConverter(converter<DistrictDbType>()))
 }
 
-const createDistrict = async (id: string, name: string, leaderId: string): Promise<void> => {
-  const district: District = {
-    id,
-    name,
-    leaderId,
-    membersIds: [],
+const createDistrict = async (district: District): Promise<DistrictDbType> => {
+  const districtIn: DistrictDbType = {
+    id: crypto.randomUUID(),
+    name: district.name,
+    leaderId: district.leader.id,
+    members: [],
   }
 
+  // check if this district name already exists
+  // lets verify that we don't have a district with that name yet
   const districtCollection = collection(db, `${topCollection}/${wardDoc}/districts`)
-  await setDoc(doc(districtCollection, id), {
-    ...district
+  const q = query(districtCollection, where("name", "==", district.name));
+  const snap = await getDocs(q)
+
+  if (snap.size > 0) {
+    districtIn.id = snap.docs[0].data().id 
+  }
+
+  if (district.assistant) {
+    districtIn.assistantId = district.assistant.id
+  }
+
+  await setDoc(doc(districtCollection, districtIn.id), {
+    ...districtIn
   })
+  return districtIn
 }
 
-const saveMemberToDistrict = async (id: string, district: District): Promise<void> => {
-  const districtCollection = collection(db, `${topCollection}/${wardDoc}/districts`)
-  await setDoc(doc(districtCollection, id), {
-    ...district
-  })
-}
+//const saveMemberToDistrict = async (id: string, district: District): Promise<void> => {
+//  const districtCollection = collection(db, `${topCollection}/${wardDoc}/districts`)
+//  await setDoc(doc(districtCollection, id), {
+//    ...district
+//  })
+//}
 
-export { createDistrict, getDistrict, saveMemberToDistrict }
+export { createDistrict, getDistricts }
