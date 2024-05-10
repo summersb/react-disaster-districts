@@ -1,4 +1,4 @@
-import { QuerySnapshot, collection, doc, getDocs, setDoc, query, where } from 'firebase/firestore'
+import { QuerySnapshot, collection, doc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore'
 import { converter } from './converter'
 import { db } from "./firebase"
 import type { District, DistrictDbType } from '@/type'
@@ -8,6 +8,18 @@ const topCollection = import.meta.env.VITE_top_collection
 
 const getDistricts = async (): Promise<QuerySnapshot<DistrictDbType>> => {
   return await getDocs(collection(db, `${topCollection}/${wardDoc}/districts`).withConverter(converter<DistrictDbType>()))
+}
+
+const getDistrict = async (id: string): Promise<DistrictDbType> => {
+  const docRef = doc(db, `${topCollection}/${wardDoc}/districts/${id}`)
+  const districtSnap = await getDoc(docRef)
+  if (districtSnap.exists()) {
+    return districtSnap.data() as DistrictDbType
+  }
+  else {
+    throw new Error("District not found")
+  }
+  
 }
 
 const createDistrict = async (district: District): Promise<DistrictDbType> => {
@@ -45,4 +57,4 @@ const createDistrict = async (district: District): Promise<DistrictDbType> => {
 //  })
 //}
 
-export { createDistrict, getDistricts }
+export { createDistrict, getDistrict, getDistricts }

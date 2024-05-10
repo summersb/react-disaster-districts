@@ -2,14 +2,33 @@ import {
   Form,
 } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SubmitHandler, useForm } from "react-hook-form"
-import type { District } from "@/type"
+import { SubmitHandler, useForm, UseFormReset } from "react-hook-form"
+import type { District, DistrictDbType } from "@/type"
 import { DistrictSchema } from "@/type"
-import React from 'react'
-import { createDistrict } from "@/api"
+import React, { useEffect } from 'react'
+import { createDistrict, getDistrict, getMember } from "@/api"
 import DistrictForm from './DistrictForm'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom';
 
-const AddDistrict = (): React.ReactElement => {
+const getStuff = async (reset: UseFormReset, d: DistrictDbType): Promise<void> => {
+  console.log("Get Stuff", d)
+  const leader = await getMember(d.leaderId)
+  if (leader === null) {
+    console.log("Error, no leader found")
+    return
+  }
+  const newDistrict = {
+    id: d.id,
+    name: d.name,
+    leader,
+    members: []
+  }
+  reset(newDistrict)
+}
+
+const EditDistrict = (): React.ReactElement => {
+  const { districtId } = useParams();
 
   const form = useForm<District>({
     resolver: zodResolver(DistrictSchema),
@@ -22,15 +41,28 @@ const AddDistrict = (): React.ReactElement => {
     }
   })
 
+  const { data } = useQuery({
+    queryKey: ["district", districtId],
+    queryFn: () => getDistrict(districtId as string),
+    enabled: districtId !== undefined,
+    retry: false
+  })
+
+  useEffect(() => {
+    if (data) {
+      getStuff(form.reset, data)
+    }
+  }, [data, form])
+
   const onSubmit: SubmitHandler<District> = async (data) => {
     createDistrict(data)
       .then(d => {
         console.log("created", d)
         form.setValue("id", d.id)
       })
-      .catch(err => {
+      .catch((err: Error) => {
         form.setError("name", {
-          type:'custom',
+          type: 'custom',
           message: err.message
         })
       })
@@ -58,7 +90,7 @@ const AddDistrict = (): React.ReactElement => {
                 type="submit"
                 className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
-                Submit
+                Save
               </button>
             </div>
 
@@ -69,4 +101,5 @@ const AddDistrict = (): React.ReactElement => {
   )
 }
 
-export default AddDistrict
+export default EditDistrict
+

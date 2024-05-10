@@ -15,6 +15,7 @@ export default function Districts() {
     queryKey: ['districts'],
     queryFn: getDistricts,
   })
+
   return (
     <Table>
       <TableCaption>List of districts</TableCaption>
@@ -29,7 +30,7 @@ export default function Districts() {
       </TableHeader>
       <TableBody>
         {data && data.docs.map(d => (
-          <District district={d.data()} />
+          <District key={d.data().id} district={d.data()} />
         ))}
       </TableBody>
     </Table>

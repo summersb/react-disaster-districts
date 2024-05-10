@@ -10,15 +10,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import CsvDownloader from 'react-csv-downloader'
-import {FilePenLine, Trash2} from "lucide-react";
+import { FilePenLine, Trash2 } from "lucide-react";
 import {
   Dialog, DialogClose,
   DialogContent, DialogDescription, DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog.tsx";
-import {useState} from "react";
-import {Button} from "@/components/ui/button.tsx";
+import { useState } from "react";
+import { Button } from "@/components/ui/button.tsx";
 
 const MemberList = () => {
   const [open, setOpen] = useState(false)
@@ -33,13 +33,13 @@ const MemberList = () => {
     if (id) {
       deleteMember(id).then(() => {
         setOpen(false)
-        queryClient.invalidateQueries({queryKey: ['members']})
+        queryClient.invalidateQueries({ queryKey: ['members'] })
       })
-      .catch(e => {
-        setOpen(false)
-        alert(e.message)
+        .catch(e => {
+          setOpen(false)
+          alert(e.message)
 
-      })
+        })
     }
   }
 
@@ -105,7 +105,7 @@ const MemberList = () => {
                   <TableCell>{m.data().name}</TableCell>
                   <TableCell>{m.data().formattedAddress}</TableCell>
                   <TableCell>{m.data().phone}</TableCell>
-                  <TableCell><Trash2 onClick={() => { setId(m.id);setOpen(true);}}/></TableCell>
+                  <TableCell><Trash2 onClick={() => { setId(m.id); setOpen(true); }} /></TableCell>
                 </TableRow>
               )
             })}

@@ -11,7 +11,7 @@ type MapDisplayProps = {
 
 const MapDisplay = ({ lat = 33.1928423, lng = -117.2413057 }: MapDisplayProps): React.ReactElement => {
   const { data, isError, error } = useQuery({
-    queryKey: ['Members'],
+    queryKey: ['members'],
     queryFn: getMembers,
     retry: false,
   })
@@ -20,9 +20,7 @@ const MapDisplay = ({ lat = 33.1928423, lng = -117.2413057 }: MapDisplayProps): 
     alert(error)
   }
 
-  //  console.log("MapDisplay loading", lat, lng);
-
-  const m = data?.docs.map((d) => d.data())
+  const m = data?.docs.map((d) => d.data()).filter(m => m.lat !== undefined)
 
   return (
     <div className="h-full">
