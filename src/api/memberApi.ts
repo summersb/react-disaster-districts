@@ -10,11 +10,11 @@ const getMembers = async (): Promise<QuerySnapshot<Member>> => {
   return await getDocs(collection(db, `${topCollection}/${wardDoc}/members`).withConverter(converter<Member>()))
 }
 
-const getMember = async (id: string): Promise<Member|null> => {
+const getMember = async (id: string): Promise<Member | null> => {
   const docRef = doc(db, `${topCollection}/${wardDoc}/members/${id}`)
   const memberSnap = await getDoc(docRef)
   if (memberSnap.exists()) {
-    return memberSnap.data().withConverter(converter<Member>())
+      return memberSnap.data() as Member
   }
   else {
     return null
@@ -22,9 +22,10 @@ const getMember = async (id: string): Promise<Member|null> => {
 }
 
 const saveMember = async (member: Member): Promise<void> => {
+  const cleanMember: Member =  Object.fromEntries(Object.entries(member).filter(([_, v]) => v != null)) as Member;
   const memberCollection = collection(db, `${topCollection}/${wardDoc}/members`)
-  await setDoc(doc(memberCollection, member.id), {
-    ...member
+  await setDoc(doc(memberCollection, cleanMember.id), {
+    ...cleanMember
   })
 }
 

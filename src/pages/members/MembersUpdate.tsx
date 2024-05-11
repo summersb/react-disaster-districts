@@ -23,6 +23,8 @@ const MembersUpdate = ({ members }: MembersProps): React.ReactElement => {
             <TableHead>Surname</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Address</TableHead>
+            <TableHead>City</TableHead>
+            <TableHead>State</TableHead>
             <TableHead>Phone</TableHead>
           </TableRow>
         </TableHeader>
@@ -37,7 +39,13 @@ const MembersUpdate = ({ members }: MembersProps): React.ReactElement => {
                   {m.old.name}|{m.updated.name}
                 </TableCell>
                 <TableCell>
-                  {m.old.formattedAddress}|{m.updated.formattedAddress}
+                  {m.old.address1}|{m.updated.address1},{m.old.address2}|{m.updated.address2}
+                </TableCell>
+                <TableCell>
+                  {m.old.city}|{m.updated.city}
+                </TableCell>
+                <TableCell>
+                  {m.old.state}|{m.updated.state}
                 </TableCell>
                 <TableCell>
                   {m.old.phone}|{m.updated.phone}

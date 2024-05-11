@@ -41,7 +41,6 @@ const UploadMembers = () => {
   }
 
   const csvFileToArray = (str: string) => {
-    //const csvHeader = str.slice(0, str.indexOf('\n')).split(';')
     const csvRows = str.slice(str.indexOf('\n') + 1).split('\n')
 
     const array: Member[] = csvRows.map((i) => {
@@ -102,7 +101,11 @@ const UploadMembers = () => {
         return old.familyName === m.familyName && old.name === m.name
       })
       if (found) {
-        existingMembers.push(m)
+        if (found.address1 === m.address1) {
+          existingMembers.push(m)
+        } else {
+          changedMembers.push({old:found, updated:m})
+        }
       } else {
         console.log("Did not match member", m.familyName, m.name)
         m.id = crypto.randomUUID()
@@ -143,6 +146,7 @@ const UploadMembers = () => {
   }
 
   console.log("Matching members", existingMembers?.length ?? 0)
+  console.log("Changed members", changedMembers?.length ?? 0)
 
   return (
     <div className="p-4">

@@ -1,4 +1,5 @@
 import AddMember from './pages/members/AddMember'
+import EditMember from './pages/members/EditMember'
 import MapDisplay from './pages/map/MapDisplay'
 import useAuth from '@/hooks/useAuth'
 import { Routes, Route } from 'react-router-dom'
@@ -40,6 +41,7 @@ function App() {
           <Route path="district/:districtId" element={<EditDistrict />} />
           <Route path="members" element={<MemberList />} />
           <Route path="addmember" element={<AddMember />} />
+          <Route path="editmember/:memberId" element={<EditMember />} />
           <Route path="upload" element={<UploadMembers />} />
           <Route path="fakedata" element={<AddFakeMember />} />
           <Route path="map" element={ <div className="h-screen" > <MapDisplay /> </div> } /> 

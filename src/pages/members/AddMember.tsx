@@ -1,20 +1,14 @@
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+import { Form } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { saveMember } from '@/api'
 import type { Member, Result } from '@/type'
 import { MemberSchema } from '@/type'
+import MemberForm from './MemberForm'
 
 export default function AddMember() {
+
   const form = useForm<Member>({
     resolver: zodResolver(MemberSchema),
     defaultValues: {
@@ -22,15 +16,15 @@ export default function AddMember() {
       familyName: '',
       name: '',
       formattedAddress: '',
-      phone: '',
-      address1: '',
-      address2: '',
+      phone: undefined,
+      address1: undefined,
+      address2: undefined,
       city: 'Vista',
       state: 'CA',
-      postalCode: null,
-      lat: null,
-      lng: null,
-    },
+      postalCode: undefined,
+      lat: undefined,
+      lng: undefined,
+    }
   })
 
   const resolveAddress = async (address: string): Promise<Result> =>
@@ -56,23 +50,30 @@ export default function AddMember() {
       })
 
   const onSubmit: SubmitHandler<Member> = async (data) => {
-    const address = await resolveAddress(
-      `${data.address1},${data.address2 === '' ? '' : data.address2 + ','}${data.city},${data.state}`,
-    )
+    if (data.lat === undefined || data.lng === undefined) {
+      const address = await resolveAddress(
+        `${data.address1},${data.address2 === '' ? '' : data.address2 + ','}${data.city},${data.state}`,
+      )
 
-    data.formattedAddress = address.formatted_address
-    data.lat = address.geometry.location.lat
-    data.lng = address.geometry.location.lng
-    data.postalCode = parseInt(
-      address?.address_components?.find(
-        (addressComponent) => addressComponent.types[0] === 'postal_code',
-      )?.long_name ?? '0',
-    )
+      data.formattedAddress = address.formatted_address
+      data.lat = address.geometry.location.lat
+      data.lng = address.geometry.location.lng
+      data.postalCode = parseInt(
+        address?.address_components?.find(
+          (addressComponent) => addressComponent.types[0] === 'postal_code',
+        )?.long_name ?? '0',
+      )
+    }
     // save to firestore
     await saveMember(data)
     form.reset()
   }
 
+  if (Object.keys(form.formState.errors).length > 0) {
+    console.log("errors", form.formState.errors)
+  }
+
+  
   return (
     <>
       <div className="text-xl flex justify-around">Add Member</div>
@@ -81,103 +82,13 @@ export default function AddMember() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-2/3 space-y-6"
         >
-          <FormField
-            control={form.control}
-            name="familyName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Family Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Family name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input placeholder="760-555-1212" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="address1"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="123 Street" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="address2"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address2</FormLabel>
-                <FormControl>
-                  <Input placeholder="Apt 23" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Input placeholder="Vista" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>State</FormLabel>
-                <FormControl>
-                  <Input placeholder="CA" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <MemberForm />
           <Button
             variant="outline"
             disabled={form.formState.isSubmitting}
             type="submit"
           >
-            Submit
+            Add Member
           </Button>
         </form>
       </Form>

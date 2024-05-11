@@ -15,7 +15,7 @@ const Sidebar = () => {
   const { user } = useAuth()
 
   return (
-    <div className="flex flex-col w-[300px] min-w[-300px] border-r min-h-screen p-4 m-1 space-y-2">
+    <div className="flex flex-col h-full space-y-4">
       <div className="flex flex-row">
         <Avatar>
           <AvatarImage src={user.photoURL ?? ''} />

@@ -1,4 +1,4 @@
-import { QuerySnapshot, collection, doc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore'
+import { QuerySnapshot, collection, doc, deleteDoc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore'
 import { converter } from './converter'
 import { db } from "./firebase"
 import type { District, DistrictDbType } from '@/type'
@@ -19,7 +19,10 @@ const getDistrict = async (id: string): Promise<DistrictDbType> => {
   else {
     throw new Error("District not found")
   }
-  
+}
+
+const deleteDistrict = async (id: string): Promise<void> => {
+  return deleteDoc(doc(db, `${topCollection}/${wardDoc}/districts`, id))
 }
 
 const createDistrict = async (district: District): Promise<DistrictDbType> => {
@@ -37,7 +40,7 @@ const createDistrict = async (district: District): Promise<DistrictDbType> => {
   const snap = await getDocs(q)
 
   if (snap.size > 0) {
-    districtIn.id = snap.docs[0].data().id 
+    districtIn.id = snap.docs[0].data().id
   }
 
   if (district.assistant) {
@@ -57,4 +60,4 @@ const createDistrict = async (district: District): Promise<DistrictDbType> => {
 //  })
 //}
 
-export { createDistrict, getDistrict, getDistricts }
+export { createDistrict, getDistrict, getDistricts, deleteDistrict }

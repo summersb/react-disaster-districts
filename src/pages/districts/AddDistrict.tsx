@@ -15,7 +15,7 @@ const AddDistrict = (): React.ReactElement => {
     resolver: zodResolver(DistrictSchema),
     defaultValues: {
       id: undefined,
-      name: undefined,
+      name: "",
       leader: undefined,
       assistant: undefined,
       members: []

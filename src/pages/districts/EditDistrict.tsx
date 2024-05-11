@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom';
 const getStuff = async (reset: UseFormReset, d: DistrictDbType): Promise<void> => {
   console.log("Get Stuff", d)
   const leader = await getMember(d.leaderId)
-  if (leader === null) {
+  if (leader === undefined) {
     console.log("Error, no leader found")
     return
   }

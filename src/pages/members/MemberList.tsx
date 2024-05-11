@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Link } from 'react-router-dom'
 import CsvDownloader from 'react-csv-downloader'
 import { FilePenLine, Trash2 } from "lucide-react";
 import {
@@ -97,14 +98,18 @@ const MemberList = () => {
         </TableHeader>
         <TableBody>
           {data &&
-            data.docs.map((m) => {
+            data.docs.map(m => m.data()).sort((m1, m2) => {
+              if (m1.familyName.toLowerCase() < m2.familyName.toLowerCase()) { return -1 }
+              if (m1.familyName.toLowerCase() > m2.familyName.toLowerCase()) { return 1 }
+              return 0
+            }).map((m) => {
               return (
-                <TableRow key={m.data().id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                  <TableCell><FilePenLine /></TableCell>
-                  <TableCell>{m.data().familyName}</TableCell>
-                  <TableCell>{m.data().name}</TableCell>
-                  <TableCell>{m.data().formattedAddress}</TableCell>
-                  <TableCell>{m.data().phone}</TableCell>
+                <TableRow key={m.id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                  <TableCell><Link to={`/editmember/${m.id}`}><FilePenLine /></Link></TableCell>
+                  <TableCell>{m.familyName}</TableCell>
+                  <TableCell>{m.name}</TableCell>
+                  <TableCell>{m.formattedAddress}</TableCell>
+                  <TableCell>{m.phone}</TableCell>
                   <TableCell><Trash2 onClick={() => { setId(m.id); setOpen(true); }} /></TableCell>
                 </TableRow>
               )
