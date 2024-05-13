@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useState} from 'react'
 import {
   FormControl,
   FormField,
@@ -6,8 +6,8 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
 import {
   Command,
   CommandEmpty,
@@ -15,49 +15,50 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
-import { CommandInput } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useFormContext } from "react-hook-form"
-import { cn } from "@/lib/utils"
-import { Check, ChevronsUpDown } from "lucide-react"
+import {CommandInput} from "@/components/ui/command"
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
+import {useFormContext} from "react-hook-form"
+import {cn} from "@/lib/utils"
+import {Check, ChevronsUpDown} from "lucide-react"
 import MapDisplay from '@/pages/map/MapDisplay'
-import { useQuery } from "@tanstack/react-query"
-import { getMembers } from "@/api"
-import type { Member } from "@/type"
+import {useQuery} from "@tanstack/react-query"
+import {getMemberList} from "@/api"
+import type {Member} from "@/type"
 
 const DistrictForm = () => {
   const [openLeader, setOpenLeader] = useState(false)
   const [openAssistant, setOpenAssistant] = useState(false)
   const form = useFormContext()
-  const { data } = useQuery({
+  const {data} = useQuery({
     queryKey: ['members'],
-    queryFn: getMembers,
+    queryFn: getMemberList
   })
 
   const leader = form.getValues("leader")
   const assistant = form.getValues("assistant")
 
-  const memberList: Member[] = data?.docs.map((d) => d.data()) ?? []
+  const memberList: Member[] = data ?? []
   return (
     <>
       <div className="text-gray-700 mb-4">
         <FormField
           control={form.control}
           name="name"
-          render={({ field }) => (
+          render={({field}) => (
             <FormItem>
               <FormLabel>District Name</FormLabel>
               <FormControl>
                 <Input placeholder="District name" {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
       </div>
 
       <div className="text-gray-700 mb-4">
-        <FormLabel className={cn(form.formState.errors.leader && "text-destructive")} >Leader</FormLabel>
+        <FormLabel
+          className={cn(form.formState.errors.leader && "text-destructive")}>Leader</FormLabel>
         <Popover open={openLeader} onOpenChange={setOpenLeader}>
           <PopoverTrigger asChild>
             <Button
@@ -72,12 +73,12 @@ const DistrictForm = () => {
               ) : (
                 <>Select district leader</>
               )}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="p-0" side="bottom" align="start">
             <Command>
-              <CommandInput placeholder="Leader" />
+              <CommandInput placeholder="Leader"/>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
@@ -105,7 +106,8 @@ const DistrictForm = () => {
             </Command>
           </PopoverContent>
         </Popover>
-        {form.formState.errors.leader && <div className="text-sm font-medium text-destructive">Leader must be selected</div>}
+        {form.formState.errors.leader &&
+            <div className="text-sm font-medium text-destructive">Leader must be selected</div>}
       </div>
 
       <div className="text-gray-700 mb-4">
@@ -124,12 +126,12 @@ const DistrictForm = () => {
               ) : (
                 <>Select district assistant leader</>
               )}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="p-0" side="bottom" align="start">
             <Command>
-              <CommandInput placeholder="Assistant Leader" />
+              <CommandInput placeholder="Assistant Leader"/>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
@@ -137,7 +139,7 @@ const DistrictForm = () => {
                     <CommandItem
                       key={member.id}
                       value={member.id}
-                      keywords={[member.familyName, member.name, member.formattedAddress]}
+                      keywords={[member.familyName, member.name, member.formattedAddress as string]}
                       onSelect={() => {
                         form.setValue('assistant', member)
                         setOpenAssistant(false)
@@ -182,7 +184,7 @@ const DistrictForm = () => {
           ></textarea>
         </div>
         <div className="w-1/2 ml-2">
-          <MapDisplay lat={leader?.lat ?? 33.1928423} lng={leader?.lng ?? -117.2413057} />
+          <MapDisplay lat={leader?.lat ?? 33.1928423} lng={leader?.lng ?? -117.2413057}/>
         </div>
       </div>
     </>

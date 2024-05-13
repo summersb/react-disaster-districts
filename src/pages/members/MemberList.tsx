@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getMembers, deleteMember } from '@/api'
+import {useQuery, useQueryClient} from '@tanstack/react-query'
+import {getMemberList, deleteMember} from '@/api'
 import {
   Table,
   TableBody,
@@ -9,38 +9,38 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
 import CsvDownloader from 'react-csv-downloader'
-import { FilePenLine, Trash2 } from "lucide-react";
+import {FilePenLine, Trash2} from "lucide-react";
 import {
   Dialog, DialogClose,
   DialogContent, DialogDescription, DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog.tsx";
-import { useState } from "react";
-import { Button } from "@/components/ui/button.tsx";
+import {useState} from "react";
+import {Button} from "@/components/ui/button.tsx";
 
 const MemberList = () => {
   const [open, setOpen] = useState(false)
   const [id, setId] = useState<string>()
   const queryClient = useQueryClient()
-  const { data } = useQuery({
+  const {data} = useQuery({
     queryKey: ['members'],
-    queryFn: getMembers,
+    queryFn: getMemberList,
   })
 
   const deleteMembe = () => {
     if (id) {
       deleteMember(id).then(() => {
         setOpen(false)
-        queryClient.invalidateQueries({ queryKey: ['members'] })
+        queryClient.invalidateQueries({queryKey: ['members']})
       })
-        .catch(e => {
-          setOpen(false)
-          alert(e.message)
+      .catch(e => {
+        setOpen(false)
+        alert(e.message)
 
-        })
+      })
     }
   }
 
@@ -53,13 +53,13 @@ const MemberList = () => {
       id: 'name',
       displayName: 'Name',
     },
-    { id: 'formattedAddress', displayName: 'Formatted Address' },
-    { id: 'address1', displayName: 'Address1' },
-    { id: 'address2', displayName: 'Address2' },
-    { id: 'city', displayName: 'City' },
-    { id: 'state', displayName: 'State' },
-    { id: 'postalCode', displayName: 'Postal Code' },
-    { id: 'phone', displayName: 'Phone' },
+    {id: 'formattedAddress', displayName: 'Formatted Address'},
+    {id: 'address1', displayName: 'Address1'},
+    {id: 'address2', displayName: 'Address2'},
+    {id: 'city', displayName: 'City'},
+    {id: 'state', displayName: 'State'},
+    {id: 'postalCode', displayName: 'Postal Code'},
+    {id: 'phone', displayName: 'Phone'},
     {
       id: 'lat',
       displayName: 'Latitude',
@@ -69,8 +69,6 @@ const MemberList = () => {
       displayName: 'Longitude',
     },
   ]
-  const datas = data?.docs.map((d) => d.data())
-
   return (
     <>
       <div className="text-xl flex justify-around">Members</div>
@@ -79,7 +77,7 @@ const MemberList = () => {
           filename="memberlist"
           separator=";"
           columns={columns}
-          datas={datas ?? []}
+          datas={data ?? []}
           text="Download CSV"
           className="p-2 mr-4 rounded outline outline-offset-2"
         />
@@ -91,26 +89,44 @@ const MemberList = () => {
             <TableHead>Edit</TableHead>
             <TableHead>Surname</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Address</TableHead>
+            <TableHead>Formatted Address</TableHead>
+            <TableHead>Address1</TableHead>
+            <TableHead>Address2</TableHead>
+            <TableHead>City</TableHead>
+            <TableHead>State</TableHead>
+            <TableHead>Zip</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Delete</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data &&
-            data.docs.map(m => m.data()).sort((m1, m2) => {
-              if (m1.familyName.toLowerCase() < m2.familyName.toLowerCase()) { return -1 }
-              if (m1.familyName.toLowerCase() > m2.familyName.toLowerCase()) { return 1 }
+            data.sort((m1, m2) => {
+              if (m1.familyName.toLowerCase() < m2.familyName.toLowerCase()) {
+                return -1
+              }
+              if (m1.familyName.toLowerCase() > m2.familyName.toLowerCase()) {
+                return 1
+              }
               return 0
             }).map((m) => {
               return (
-                <TableRow key={m.id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                  <TableCell><Link to={`/editmember/${m.id}`}><FilePenLine /></Link></TableCell>
+                <TableRow key={m.id}
+                          className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                  <TableCell><Link to={`/editmember/${m.id}`}><FilePenLine/></Link></TableCell>
                   <TableCell>{m.familyName}</TableCell>
                   <TableCell>{m.name}</TableCell>
                   <TableCell>{m.formattedAddress}</TableCell>
+                  <TableCell>{m.address1}</TableCell>
+                  <TableCell>{m.address2}</TableCell>
+                  <TableCell>{m.city}</TableCell>
+                  <TableCell>{m.state}</TableCell>
+                  <TableCell>{m.postalCode}</TableCell>
                   <TableCell>{m.phone}</TableCell>
-                  <TableCell><Trash2 onClick={() => { setId(m.id); setOpen(true); }} /></TableCell>
+                  <TableCell><Trash2 onClick={() => {
+                    setId(m.id);
+                    setOpen(true);
+                  }}/></TableCell>
                 </TableRow>
               )
             })}

@@ -1,15 +1,15 @@
-import { Form } from '@/components/ui/form'
-import { deleteMember, saveMember, getMembers } from '@/api'
-import type { Member } from '@/type'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import React, { useState } from 'react'
+import {Form} from '@/components/ui/form'
+import {getMemberList, saveMemberList} from '@/api'
+import type {Member} from '@/type'
+import {useQuery, useQueryClient} from '@tanstack/react-query'
+import React, {useState} from 'react'
 import UploadMembersDetail from './UploadMembersDetail'
 import MembersUpdate from './MembersUpdate'
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import {Button} from '@/components/ui/button';
+import {Tabs, TabsList, TabsTrigger, TabsContent} from '@/components/ui/tabs'
 import ImportDirectoryList from './ImportDirectoryList'
-import { useForm } from 'react-hook-form'
-import { parseData } from './process.ts'
+import {useForm} from 'react-hook-form'
+import {parseData} from './process.ts'
 
 type FormType = {
   data: string
@@ -24,9 +24,9 @@ const UploadMembers = () => {
 
   const fileReader = new FileReader()
 
-  const { data: oldMembers } = useQuery({
+  const {data: dbMemberList} = useQuery({
     queryKey: ['members'],
-    queryFn: getMembers,
+    queryFn: getMemberList,
   })
 
   const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -71,7 +71,7 @@ const UploadMembers = () => {
     e.preventDefault()
 
     if (file) {
-      fileReader.onload = function(event) {
+      fileReader.onload = function (event) {
         const text = event.target?.result
         if (text) {
           csvFileToArray(text as string)
@@ -94,8 +94,7 @@ const UploadMembers = () => {
   const removedMembers: Member[] = []
   const changedMembers: Changed[] = []
 
-  if (members && oldMembers) {
-    const dbMemberList = oldMembers.docs.map((d) => d.data())
+  if (members && dbMemberList) {
     members.forEach((m: Member) => {
       const found = dbMemberList.find((old) => {
         return old.familyName === m.familyName && old.name === m.name
@@ -104,7 +103,7 @@ const UploadMembers = () => {
         if (found.address1 === m.address1) {
           existingMembers.push(m)
         } else {
-          changedMembers.push({old:found, updated:m})
+          changedMembers.push({old: found, updated: m})
         }
       } else {
         console.log("Did not match member", m.familyName, m.name)
@@ -123,26 +122,30 @@ const UploadMembers = () => {
   }
 
   const insertNewMembers = () => {
+    const updateList = dbMemberList ?? []
     newMembers?.forEach(m => {
       console.log("Saving", m)
-      saveMember(m)
-        .catch(err => {
-          console.error(err, m)
-        })
+      updateList.push(m)
+      saveMemberList(updateList)
+      .catch(err => {
+        console.error(err, m)
+      })
     })
-    queryClient.invalidateQueries({ queryKey: ['members'] })
+    queryClient.invalidateQueries({queryKey: ['members']})
     newMembers.length = 0
   }
 
   const deleteMembers = () => {
-    removedMembers?.forEach(m => {
-      console.log("Deleting", m)
-      deleteMember(m.id)
-        .catch(err => {
-          console.error(err, m)
-        })
+    const updateList: Member[] = dbMemberList ?? []
+    const ids = removedMembers.map(m => m.id)
+    console.log("Deleting", ids)
+    saveMemberList(updateList.filter((m: Member) => !ids.includes(m.id)))
+    .catch(err => {
+      console.error(err, updateList, ids)
     })
+    queryClient.invalidateQueries({queryKey: ['members']})
     newMembers.length = 0
+    removedMembers.length = 0
   }
 
   console.log("Matching members", existingMembers?.length ?? 0)
@@ -162,7 +165,7 @@ const UploadMembers = () => {
             <TabsContent value="web">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
-                  <ImportDirectoryList />
+                  <ImportDirectoryList/>
                   <Button type="submit">Process</Button>
                 </form>
               </Form>
@@ -192,25 +195,29 @@ const UploadMembers = () => {
       {(newMembers.length ?? 0) > 0 && (
         <>
           New members
-          <UploadMembersDetail members={newMembers} />
-          <Button onClick={insertNewMembers} className="p-2 mr-4 rounded outline outline-offset-2">Insert</Button>
+          <UploadMembersDetail members={newMembers}/>
+          <Button onClick={insertNewMembers}
+                  className="p-2 mr-4 rounded outline outline-offset-2">Insert</Button>
         </>
       )}
       {(changedMembers.length ?? 0) > 0 && (
         <>
           Changed Members
-          <MembersUpdate members={changedMembers} />
-          <Button onClick={insertNewMembers} className="p-2 mr-4 rounded outline outline-offset-2">Update</Button>
+          <MembersUpdate members={changedMembers}/>
+          <Button onClick={insertNewMembers}
+                  className="p-2 mr-4 rounded outline outline-offset-2">Update</Button>
         </>
       )}
       {(removedMembers.length ?? 0) > 0 && (
         <>
           Removed Members
-          <UploadMembersDetail members={removedMembers} />
-          <Button onClick={deleteMembers} className="p-2 mr-4 rounded outline outline-offset-2">Delete</Button>
+          <UploadMembersDetail members={removedMembers}/>
+          <Button onClick={deleteMembers}
+                  className="p-2 mr-4 rounded outline outline-offset-2">Delete</Button>
         </>)}
       {(members?.length ?? 0) > 0 && (
-        <Button onClick={() => setMembers([])} className="p-2 mr-4 rounded outline outline-offset-2">Cancel</Button>
+        <Button onClick={() => setMembers([])}
+                className="p-2 mr-4 rounded outline outline-offset-2">Cancel</Button>
       )}
     </div>
   )

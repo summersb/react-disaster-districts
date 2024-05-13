@@ -1,4 +1,4 @@
-import { z } from "zod"
+import {z} from "zod"
 
 export const MemberSchema = z.object({
   id: z.string().uuid(),
@@ -17,14 +17,11 @@ export const MemberSchema = z.object({
 
 export type Member = z.infer<typeof MemberSchema>
 
-export interface MemberRecord {
-  id: string
-  member: Member
-}
-
 export type Changed = {
   old: Member
   updated: Member
 }
 
-export type MemberMap = Record<string, string>
+export type MemberMap = {
+  [key: string]: Member
+}

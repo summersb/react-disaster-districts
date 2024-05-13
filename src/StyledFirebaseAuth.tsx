@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
-import { onAuthStateChanged } from 'firebase/auth'
+import {useEffect, useRef, useState} from 'react'
+import {onAuthStateChanged} from 'firebase/auth'
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
-import { log } from 'console'
 
 interface Props {
   // The Firebase UI Web UI Config object.
@@ -19,11 +18,11 @@ interface Props {
 }
 
 const StyledFirebaseAuth = ({
-  uiConfig,
-  firebaseAuth,
-  className,
-  uiCallback,
-}: Props) => {
+                              uiConfig,
+                              firebaseAuth,
+                              className,
+                              uiCallback,
+                            }: Props) => {
   const [userSignedIn, setUserSignedIn] = useState(false)
   const elementRef = useRef(null)
 
@@ -53,7 +52,7 @@ const StyledFirebaseAuth = ({
     }
   }, [firebaseui, uiConfig])
 
-  return <div className={className} ref={elementRef} />
+  return <div className={className} ref={elementRef}/>
 }
 
 export default StyledFirebaseAuth
