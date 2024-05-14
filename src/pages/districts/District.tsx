@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import type { DistrictDbType } from '@/type'
+import {useState} from 'react'
+import type {DistrictDbType} from '@/type'
 import {
   TableCell,
   TableRow,
@@ -10,18 +10,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog.tsx";
-import { deleteDistrict } from '@/api'
-import { useQueryClient } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
-import { FilePenLine, Trash2 } from "lucide-react";
-import { Link } from 'react-router-dom'
+import {deleteDistrict} from '@/api'
+import {useQueryClient} from '@tanstack/react-query'
+import {Button} from '@/components/ui/button'
+import {FilePenLine, Trash2} from "lucide-react";
+import {Link} from 'react-router-dom'
 
 type DistrictProps = {
   district: DistrictDbType
 }
 export default function District(props: DistrictProps) {
-  const { district: d } = props
-  const [ open, setOpen ] = useState<boolean>(false)
+  const {district: d} = props
+  const [open, setOpen] = useState<boolean>(false)
   const queryClient = useQueryClient()
 
   const delDistrict = () => {
@@ -30,17 +30,18 @@ export default function District(props: DistrictProps) {
 
   const doDelete = () => {
     deleteDistrict(d.id)
-    queryClient.invalidateQueries({ queryKey: ['districts'] })
+    queryClient.invalidateQueries({queryKey: ['districts']})
     setOpen(false)
   }
 
   return (
     <TableRow>
-      <TableCell><Link to={`/district/${d.id}`}><Button size="icon"><FilePenLine /></Button></Link></TableCell>
+      <TableCell><Link to={`/district/${d.id}`}><Button
+        size="icon"><FilePenLine/></Button></Link></TableCell>
       <TableCell>{d.name}</TableCell>
       <TableCell>{d.leaderId}</TableCell>
       <TableCell>{d.assistantId}</TableCell>
-      <TableCell><Trash2 onClick={delDistrict} />
+      <TableCell><Trash2 onClick={delDistrict}/>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent>
             <DialogHeader>
@@ -64,6 +65,6 @@ export default function District(props: DistrictProps) {
           </DialogContent>
         </Dialog>
       </TableCell>
-    </TableRow >
+    </TableRow>
   )
 }

@@ -1,17 +1,17 @@
 import {
   Form,
 } from "@/components/ui/form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SubmitHandler, useForm, UseFormReset } from "react-hook-form"
-import type { District, DistrictDbType } from "@/type"
-import { DistrictSchema } from "@/type"
-import React, { useEffect } from 'react'
-import { createDistrict, getDistrict, getMember } from "@/api"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {SubmitHandler, useForm, UseFormReset} from "react-hook-form"
+import type {District, DistrictDbType} from "@/type"
+import {DistrictSchema} from "@/type"
+import React, {useEffect} from 'react'
+import {saveDistrict, getDistrict, getMember} from "@/api"
 import DistrictForm from './DistrictForm'
-import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom';
+import {useQuery} from '@tanstack/react-query'
+import {useParams} from 'react-router-dom';
 
-const getStuff = async (reset: UseFormReset, d: DistrictDbType): Promise<void> => {
+const getStuff = async (reset: UseFormReset<District>, d: DistrictDbType): Promise<void> => {
   console.log("Get Stuff", d)
   const leader = await getMember(d.leaderId)
   if (leader === undefined) {
@@ -28,7 +28,7 @@ const getStuff = async (reset: UseFormReset, d: DistrictDbType): Promise<void> =
 }
 
 const EditDistrict = (): React.ReactElement => {
-  const { districtId } = useParams();
+  const {districtId} = useParams();
 
   const form = useForm<District>({
     resolver: zodResolver(DistrictSchema),
@@ -41,7 +41,7 @@ const EditDistrict = (): React.ReactElement => {
     }
   })
 
-  const { data } = useQuery({
+  const {data} = useQuery({
     queryKey: ["district", districtId],
     queryFn: () => getDistrict(districtId as string),
     enabled: districtId !== undefined,
@@ -55,17 +55,22 @@ const EditDistrict = (): React.ReactElement => {
   }, [data, form])
 
   const onSubmit: SubmitHandler<District> = async (data) => {
-    createDistrict(data)
-      .then(d => {
-        console.log("created", d)
-        form.setValue("id", d.id)
+    const dbDistrict: DistrictDbType = {
+      id: data.id,
+      name: data.name,
+      leaderId: data.leader.id
+    }
+    dbDistrict.assistantId = data?.assistant?.id ?? undefined
+    saveDistrict(dbDistrict)
+    .then(d => {
+      console.log("created", d)
+    })
+    .catch((err: Error) => {
+      form.setError("name", {
+        type: 'custom',
+        message: err.message
       })
-      .catch((err: Error) => {
-        form.setError("name", {
-          type: 'custom',
-          message: err.message
-        })
-      })
+    })
   }
 
   if (Object.keys(form.formState.errors).length > 0) {
@@ -80,10 +85,10 @@ const EditDistrict = (): React.ReactElement => {
         <Form {...form}>
 
           <form action="#"
-            onSubmit={form.handleSubmit(onSubmit)}
-            method="POST">
+                onSubmit={form.handleSubmit(onSubmit)}
+                method="POST">
 
-            <DistrictForm />
+            <DistrictForm/>
 
             <div className="text-gray-700 mb-4">
               <button

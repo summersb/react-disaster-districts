@@ -1,63 +1,61 @@
-import { QuerySnapshot, collection, doc, deleteDoc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore'
-import { converter } from './converter'
-import { db } from "./firebase"
-import type { District, DistrictDbType } from '@/type'
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+} from 'firebase/firestore'
+import {db} from "./firebase"
+import type {DistrictDbType, Member} from '@/type'
+import {filterNullUndefined, toList, toMap} from './arrayUtils'
 
 const wardDoc = `${import.meta.env.VITE_ward}`
 const topCollection = import.meta.env.VITE_top_collection
+const districtListDocName = 'district_list'
 
-const getDistricts = async (): Promise<QuerySnapshot<DistrictDbType>> => {
-  return await getDocs(collection(db, `${topCollection}/${wardDoc}/districts`).withConverter(converter<DistrictDbType>()))
+
+export const saveDistrictList = async (district: DistrictDbType[]): Promise<void> => {
+  const map = toMap(district)
+  return saveDistrictMap(map)
 }
 
-const getDistrict = async (id: string): Promise<DistrictDbType> => {
-  const docRef = doc(db, `${topCollection}/${wardDoc}/districts/${id}`)
+export const saveDistrictMap = async (district: Map<string, DistrictDbType>): Promise<void> => {
+  const cleanDistrictMap = filterNullUndefined(district)
+  const holderObject: {
+    [key: string]: Partial<Member>
+  } = Object.fromEntries(Array.from(cleanDistrictMap.entries()));
+  const wardCollection = collection(db, `${topCollection}/${wardDoc}/districts`)
+  await setDoc(doc(wardCollection, districtListDocName), holderObject)
+};
+
+export const getDistrictList = async (): Promise<DistrictDbType[]> => {
+  const map = await getDistrictMap()
+  return toList(map)
+}
+
+export const getDistrictMap = async (): Promise<Map<string, DistrictDbType>> => {
+  const docRef = doc(db, `${topCollection}/${wardDoc}/districts`, districtListDocName)
   const districtSnap = await getDoc(docRef)
   if (districtSnap.exists()) {
-    return districtSnap.data() as DistrictDbType
-  }
-  else {
-    throw new Error("District not found")
+    const map: { [key: string]: DistrictDbType } = districtSnap.data()
+    return new Map(Object.entries(map))
+  } else {
+    return new Map()
   }
 }
 
-const deleteDistrict = async (id: string): Promise<void> => {
-  return deleteDoc(doc(db, `${topCollection}/${wardDoc}/districts`, id))
+export const saveDistrict = async (district: DistrictDbType): Promise<void> => {
+  const map = await getDistrictMap()
+  map.set(district.id, district)
+  return saveDistrictMap(map)
 }
 
-const createDistrict = async (district: District): Promise<DistrictDbType> => {
-  const districtIn: DistrictDbType = {
-    id: crypto.randomUUID(),
-    name: district.name,
-    leaderId: district.leader.id,
-    members: [],
-  }
-
-  // check if this district name already exists
-  // lets verify that we don't have a district with that name yet
-  const districtCollection = collection(db, `${topCollection}/${wardDoc}/districts`)
-  const q = query(districtCollection, where("name", "==", district.name));
-  const snap = await getDocs(q)
-
-  if (snap.size > 0) {
-    districtIn.id = snap.docs[0].data().id
-  }
-
-  if (district.assistant) {
-    districtIn.assistantId = district.assistant.id
-  }
-
-  await setDoc(doc(districtCollection, districtIn.id), {
-    ...districtIn
-  })
-  return districtIn
+export const getDistrict = async (id: string): Promise<DistrictDbType> => {
+  const map = await getDistrictMap()
+  return map.get(id) as DistrictDbType
 }
 
-//const saveMemberToDistrict = async (id: string, district: District): Promise<void> => {
-//  const districtCollection = collection(db, `${topCollection}/${wardDoc}/districts`)
-//  await setDoc(doc(districtCollection, id), {
-//    ...district
-//  })
-//}
-
-export { createDistrict, getDistrict, getDistricts, deleteDistrict }
+export const deleteDistrict = async (id: string): Promise<void> => {
+  const map = await getDistrictMap()
+  map.delete(id)
+  return saveDistrictMap(map)
+}

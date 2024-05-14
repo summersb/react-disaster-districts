@@ -8,7 +8,13 @@ import {
   saveMemberList,
   getMemberList
 } from './memberApi'
-import {getDistrict, getDistricts, createDistrict, deleteDistrict} from './districtApi.ts'
+import {
+  saveDistrict,
+  getDistrict,
+  getDistrictMap,
+  getDistrictList,
+  deleteDistrict
+} from './districtApi.ts'
 
 export {
   db,
@@ -23,6 +29,7 @@ export {
   saveMemberList,
   deleteDistrict,
   getDistrict,
-  getDistricts,
-  createDistrict
+  getDistrictMap,
+  getDistrictList,
+  saveDistrict
 }

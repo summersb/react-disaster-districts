@@ -1,20 +1,20 @@
 import {
   Form,
 } from "@/components/ui/form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SubmitHandler, useForm } from "react-hook-form"
-import type { District } from "@/type"
-import { DistrictSchema } from "@/type"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {SubmitHandler, useForm} from "react-hook-form"
+import type {DistrictDbType} from "@/type"
+import {DistrictSchema} from "@/type"
 import React from 'react'
-import { createDistrict } from "@/api"
+import {saveDistrict} from "@/api"
 import DistrictForm from './DistrictForm'
 
 const AddDistrict = (): React.ReactElement => {
 
-  const form = useForm<District>({
+  const form = useForm<DistrictDbType>({
     resolver: zodResolver(DistrictSchema),
     defaultValues: {
-      id: undefined,
+      id: crypto.randomUUID(),
       name: "",
       leader: undefined,
       assistant: undefined,
@@ -22,18 +22,17 @@ const AddDistrict = (): React.ReactElement => {
     }
   })
 
-  const onSubmit: SubmitHandler<District> = async (data) => {
-    createDistrict(data)
-      .then(d => {
-        console.log("created", d)
-        form.setValue("id", d.id)
+  const onSubmit: SubmitHandler<DistrictDbType> = async (data) => {
+    saveDistrict(data)
+    .then(d => {
+      console.log("created", d)
+    })
+    .catch(err => {
+      form.setError("name", {
+        type: 'custom',
+        message: err.message
       })
-      .catch(err => {
-        form.setError("name", {
-          type:'custom',
-          message: err.message
-        })
-      })
+    })
   }
 
   if (Object.keys(form.formState.errors).length > 0) {
@@ -48,10 +47,10 @@ const AddDistrict = (): React.ReactElement => {
         <Form {...form}>
 
           <form action="#"
-            onSubmit={form.handleSubmit(onSubmit)}
-            method="POST">
+                onSubmit={form.handleSubmit(onSubmit)}
+                method="POST">
 
-            <DistrictForm />
+            <DistrictForm/>
 
             <div className="text-gray-700 mb-4">
               <button

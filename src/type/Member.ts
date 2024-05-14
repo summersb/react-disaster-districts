@@ -1,4 +1,5 @@
 import {z} from "zod"
+import {BaseObject} from "@/type/SharedTypes.ts";
 
 export const MemberSchema = z.object({
   id: z.string().uuid(),
@@ -15,13 +16,9 @@ export const MemberSchema = z.object({
   lng: z.number().optional(),
 })
 
-export type Member = z.infer<typeof MemberSchema>
+export type Member = z.infer<typeof MemberSchema> & BaseObject
 
 export type Changed = {
   old: Member
   updated: Member
-}
-
-export type MemberMap = {
-  [key: string]: Member
 }
