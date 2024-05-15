@@ -1,4 +1,4 @@
-import type { Member } from '@/type'
+import type {Member, Result} from '@/type'
 
 enum Mode {
   name,
@@ -9,17 +9,17 @@ enum Mode {
   unk,
 }
 
-export function parseData(data: string): Member[] {
-  const persons: Member[] = []
+export function parseData(data: string): Partial<Member>[] {
+  const persons: Partial<Member>[] = []
 
   // Split the data into individual sections based on double newline characters
   const sections = data.trim().split('\n\n')
 
   // Regular expressions to match each section
   const headerRegex = /^[A-Za-z ]+ - \d*$/
-  const seperatorRegex = /^[A-Z]$/
+  const separatorRegex = /^[A-Z]$/
   const nameAddressRegex =
-    /^([A-Za-z\-\s]+),\s([()A-Za-z&.\s]+)\s?(\d+\s*[A-Za-z0-9-/#.\s.]*)?$/
+    /^([A-Za-z\-\s]+),\s([()A-Za-z&.\s]+)\s?(\d+\s*[A-Za-z0-9-/#.\s]*)?$/
   const cityRegex = /^(Vista|VISTA|San Marcos),\s([A-Za-z]+)\s(\d*)\s?-?(\d*)?$/
   const latLngRegex = /^(-?\d+\.\d+),\s(-?\d+\.\d+)$/
 
@@ -33,7 +33,7 @@ export function parseData(data: string): Member[] {
     if (section.includes('All rights reserved')) {
       return
     }
-    if (seperatorRegex.exec(section)) {
+    if (separatorRegex.exec(section)) {
       return
     }
     const nameAddressMatch = nameAddressRegex.exec(section)
@@ -44,7 +44,7 @@ export function parseData(data: string): Member[] {
       mode = Mode.unk
       console.log("Pushed person", member)
       persons.push(member as Member)
-      member = { }
+      member = {}
     }
 
     if (mode === Mode.unk && nameAddressMatch) {
@@ -87,4 +87,46 @@ export function parseData(data: string): Member[] {
     persons.push(member)
   }
   return persons
+}
+
+
+export const resolveAddress = async (address: string): Promise<Result> =>
+  fetch(
+    `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}`,
+  )
+  .then((res) => {
+    if (res.ok) {
+      return res.json()
+    } else {
+      throw new Error('Error resolving ' + res.statusText)
+    }
+  })
+  .then((json) => {
+    if (json.status === 'OK') {
+      return json.results[0]
+    } else {
+      throw new Error('Could not resolve address' + address)
+    }
+  })
+  .catch((e) => {
+    alert(e.message)
+  })
+
+export const getGeo = async (member: Partial<Member>): Promise<Partial<Member>> => {
+  if (member.lat === undefined || member.lng === undefined) {
+    const address = await resolveAddress(
+      `${member.address1},${member.address2 === '' ? '' : member.address2 + ','}${member.city},${member.state}`,
+    )
+
+    member.formattedAddress = address.formatted_address
+    member.lat = address.geometry.location.lat
+    member.lng = address.geometry.location.lng
+    member.postalCode = parseInt(
+      address?.address_components?.find(
+        (addressComponent) => addressComponent.types[0] === 'postal_code',
+      )?.long_name ?? "0",
+    )
+  }
+
+  return member
 }

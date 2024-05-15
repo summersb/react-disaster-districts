@@ -96,6 +96,8 @@ const MemberList = () => {
             <TableHead>State</TableHead>
             <TableHead>Zip</TableHead>
             <TableHead>Phone</TableHead>
+            <TableHead>Latitude</TableHead>
+            <TableHead>Longitude</TableHead>
             <TableHead>Delete</TableHead>
           </TableRow>
         </TableHeader>
@@ -123,6 +125,8 @@ const MemberList = () => {
                   <TableCell>{m.state}</TableCell>
                   <TableCell>{m.postalCode}</TableCell>
                   <TableCell>{m.phone}</TableCell>
+                  <TableCell>{m.lat}</TableCell>
+                  <TableCell>{m.lng}</TableCell>
                   <TableCell><Trash2 onClick={() => {
                     setId(m.id);
                     setOpen(true);

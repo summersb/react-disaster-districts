@@ -13,7 +13,7 @@ export const saveMemberList = async (members: Member[]): Promise<void> => {
   return saveMemberMap(map)
 }
 
-export const saveMemberMap = async (members: Map<string, Member>): Promise<void> => {
+export const saveMemberMap = async (members: Map<string, Partial<Member>>): Promise<void> => {
   const cleanMemberMap = filterNullUndefined(members)
   const holderObject: {
     [key: string]: Partial<Member>
@@ -22,12 +22,12 @@ export const saveMemberMap = async (members: Map<string, Member>): Promise<void>
   await setDoc(doc(wardCollection, memberListDocName), holderObject)
 }
 
-export const getMemberList = async (): Promise<Member[]> => {
+export const getMemberList = async (): Promise<Partial<Member>[]> => {
   const map = await getMemberMap()
   return toList(map)
 }
 
-export const getMemberMap = async (): Promise<Map<string, Member>> => {
+export const getMemberMap = async (): Promise<Map<string, Partial<Member>>> => {
   const docRef = doc(db, `${topCollection}/${wardDoc}/members`, memberListDocName)
   const memberListSnap = await getDoc(docRef)
   if (memberListSnap.exists()) {
@@ -38,9 +38,9 @@ export const getMemberMap = async (): Promise<Map<string, Member>> => {
   }
 }
 
-export const saveMember = async (member: Member): Promise<void> => {
+export const saveMember = async (member: Partial<Member>): Promise<void> => {
   const map = await getMemberMap()
-  map.set(member.id, member)
+  map.set(member.id as string, member)
   return saveMemberMap(map)
 }
 
