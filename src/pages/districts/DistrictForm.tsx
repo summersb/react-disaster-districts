@@ -17,25 +17,37 @@ import {
 } from "@/components/ui/command"
 import {CommandInput} from "@/components/ui/command"
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
-import {useFormContext} from "react-hook-form"
+import {useFormContext, useFieldArray} from "react-hook-form"
 import {cn} from "@/lib/utils"
 import {Check, ChevronsUpDown} from "lucide-react"
 import MapDisplay from '@/pages/map/MapDisplay'
 import {useQuery} from "@tanstack/react-query"
-import {getMemberList} from "@/api"
+import {getDistrictList, getMemberList} from "@/api"
 import type {Member} from "@/type"
 
 const DistrictForm = () => {
   const [openLeader, setOpenLeader] = useState(false)
   const [openAssistant, setOpenAssistant] = useState(false)
   const form = useFormContext()
+  const {fields: districtMembers} = useFieldArray({
+    control: form.control,
+    name: "members"
+  })
+
   const {data} = useQuery({
     queryKey: ['members'],
     queryFn: getMemberList
   })
 
+  const {data: districts} = useQuery({
+    queryKey: ["districts"],
+    queryFn: getDistrictList
+  })
+
   const leader = form.getValues("leader")
   const assistant = form.getValues("assistant")
+
+  console.log("leader", leader)
 
   const memberList: Member[] = data ?? []
   return (
@@ -176,15 +188,13 @@ const DistrictForm = () => {
 
       <div className="flex text-gray-700 mb-4 h-[500px]">
         <div className="w-1/2 mr-2">
-          <textarea
-            id="districtMembers"
-            name="districtMembers"
-            className="w-full px-3 py-2 border rounded-md text-gray-700 h-full resize-none focus:outline-none focus:border-blue-500"
-            placeholder="Add from map"
-          ></textarea>
+          <ul>
+            {districtMembers?.map((m: string, idx: number) => (<li key={idx}>{m}</li>))}
+          </ul>
         </div>
         <div className="w-1/2 ml-2">
-          <MapDisplay lat={leader?.lat ?? 33.1928423} lng={leader?.lng ?? -117.2413057}/>
+          <MapDisplay districts={districts} members={memberList} lat={leader?.lat ?? 33.1928423}
+                      lng={leader?.lng ?? -117.2413057}/>
         </div>
       </div>
     </>

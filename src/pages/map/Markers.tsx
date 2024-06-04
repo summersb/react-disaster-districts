@@ -1,18 +1,13 @@
-import { AdvancedMarker, Marker } from '@vis.gl/react-google-maps'
-import type { Member } from '@/type/index'
+import type {Member} from '@/type'
+import Marker from "@/pages/map/Marker.tsx";
 
-type Props = { members: Member[] }
+type Props = { members: Member[], onSelect: (member: Member) => void }
 
-export default function Markers({ members }: Props) {
+export default function Markers({members, onSelect}: Props) {
   return (
     <div>
       {members.filter(m => m.lat !== undefined && m.lng !== undefined).map((member) => (
-        <Marker
-          position={{ lat: member.lat as number, lng: member.lng as number}}
-          key={member.id}
-          fillColor="green"
-          onClick={(e) => console.log(e)}
-        />
+        <Marker member={member} onSelect={onSelect}/>
       ))}
     </div>
   )

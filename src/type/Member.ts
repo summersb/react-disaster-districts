@@ -14,6 +14,7 @@ export const MemberSchema = z.object({
   phone: z.string().optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
+  color: z.string().optional(),
 })
 
 export type Member = z.infer<typeof MemberSchema> & BaseObject

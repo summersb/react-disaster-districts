@@ -6,8 +6,9 @@ import {SubmitHandler, useForm} from "react-hook-form"
 import type {DistrictDbType} from "@/type"
 import {DistrictSchema} from "@/type"
 import React from 'react'
-import {saveDistrict} from "@/api"
+import {getDistrictList, saveDistrict} from "@/api"
 import DistrictForm from './DistrictForm'
+import {useQuery} from "@tanstack/react-query";
 
 const AddDistrict = (): React.ReactElement => {
 
@@ -19,7 +20,7 @@ const AddDistrict = (): React.ReactElement => {
       leader: undefined,
       assistant: undefined,
       members: []
-    }
+    } as Partial<DistrictDbType>
   })
 
   const onSubmit: SubmitHandler<DistrictDbType> = async (data) => {

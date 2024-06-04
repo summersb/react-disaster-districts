@@ -1,12 +1,11 @@
 import type {Changed, Member} from "./Member"
-import {MemberSchema, MemberMap} from "./Member"
+import {MemberSchema} from "./Member"
 import type {District, DistrictDbType} from "./District"
 import {DistrictSchema} from "./District.ts"
 import type {AddressComponent, GeoPoint, GeoBox, Geometry, Result, Results} from './GoogleApi'
-import type {Map} from "./SharedTypes"
+import {districtColors} from "./Colors"
 
 export type {
-  Map,
   Changed,
   Member,
   District,
@@ -17,7 +16,6 @@ export type {
   Geometry,
   Result,
   Results,
-  MemberMap
 }
 
-export {MemberSchema, DistrictSchema}
+export {MemberSchema, DistrictSchema, districtColors}

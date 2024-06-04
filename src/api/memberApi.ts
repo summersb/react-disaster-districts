@@ -22,12 +22,12 @@ export const saveMemberMap = async (members: Map<string, Partial<Member>>): Prom
   await setDoc(doc(wardCollection, memberListDocName), holderObject)
 }
 
-export const getMemberList = async (): Promise<Partial<Member>[]> => {
+export const getMemberList = async (): Promise<Member[]> => {
   const map = await getMemberMap()
   return toList(map)
 }
 
-export const getMemberMap = async (): Promise<Map<string, Partial<Member>>> => {
+export const getMemberMap = async (): Promise<Map<string, Member>> => {
   const docRef = doc(db, `${topCollection}/${wardDoc}/members`, memberListDocName)
   const memberListSnap = await getDoc(docRef)
   if (memberListSnap.exists()) {
@@ -40,7 +40,7 @@ export const getMemberMap = async (): Promise<Map<string, Partial<Member>>> => {
 
 export const saveMember = async (member: Partial<Member>): Promise<void> => {
   const map = await getMemberMap()
-  map.set(member.id as string, member)
+  map.set(member.id as string, member as Member)
   return saveMemberMap(map)
 }
 
