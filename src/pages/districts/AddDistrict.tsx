@@ -7,26 +7,33 @@ import React from 'react'
 import { saveDistrict } from '@/api'
 import DistrictForm from './DistrictForm'
 
-const DEFAULT: Partial<DistrictDbType> = {
+const DEFAULT: Partial<District> = {
   id: crypto.randomUUID(),
   name: '',
-  leaderId: undefined,
-  assistantId: undefined,
+  leader: undefined,
+  assistant: undefined,
   color: '#FF5733',
   members: []
 }
 
 const AddDistrict = (): React.ReactElement => {
-  const form = useForm<DistrictDbType>({
+  const form = useForm<District>({
     resolver: zodResolver(DistrictSchema),
     defaultValues: DEFAULT
   })
 
-  const onSubmit = (data: DistrictDbType): Promise<void> =>
-    saveDistrict(data)
-      .then((d) => {
+  const onSubmit = (data: District): Promise<void> => {
+    const dbDistrict: DistrictDbType = {
+      id: data.id,
+      name: data.name,
+      leaderId: data.leader?.id,
+      assistantId: data.assistant?.id,
+      color: data.color,
+      members: data.members?.map(m => m.id)
+    }
+    return saveDistrict(dbDistrict)
+      .then(() => {
         form.reset(DEFAULT)
-        console.log('created', d)
       })
       .catch((err) => {
         form.setError('name', {
@@ -34,6 +41,7 @@ const AddDistrict = (): React.ReactElement => {
           message: err.message
         })
       })
+  }
 
   if (Object.keys(form.formState.errors).length > 0) {
     console.log('errors', form.formState.errors)

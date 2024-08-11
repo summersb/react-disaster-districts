@@ -27,11 +27,11 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import MapDisplay from '@/pages/map/MapDisplay'
 import { useQuery } from '@tanstack/react-query'
 import { getDistrictList, getMemberList } from '@/api'
-import type { DistrictDbType, Member } from '@/type'
+import type { District, Member } from '@/type'
 import { ColorPicker } from '@/components/ColorPicker.tsx'
 
 interface DistrictFormProps {
-  district?: DistrictDbType
+  district?: District
 }
 
 const DistrictForm = ({ district }: DistrictFormProps) => {
