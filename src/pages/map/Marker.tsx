@@ -1,15 +1,17 @@
-import * as React from 'react';
-import {AdvancedMarker, Pin} from "@vis.gl/react-google-maps";
-import {districtColors, Member} from "@/type";
-import {useState} from "react";
+import * as React from 'react'
+import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps'
+import { Member } from '@/type'
+import { useState } from 'react'
 
 type MarkerProps = {
-  member: Member,
-  onSelect: (member: Member) => void,
+  member: Member
+  onSelect: (member: Member) => void
   colors?: string[]
 }
 
-const Marker: React.FC<MarkerProps> = (props: MarkerProps): React.ReactElement => {
+const Marker: React.FC<MarkerProps> = (
+  props: MarkerProps,
+): React.ReactElement => {
   const [color, setColor] = useState<string>()
   const [background, setBackground] = useState<string>()
   const [bcolor, setBColor] = useState<string>()
@@ -24,12 +26,16 @@ const Marker: React.FC<MarkerProps> = (props: MarkerProps): React.ReactElement =
   }
   return (
     <div>
-      <AdvancedMarker position={{lat: props.member.lat as number, lng: props.member.lng as number}}
-                      key={props.member.id}
-                      onClick={() => {
-                        onSelect(props.member)
-                        props.member.color = "#222222"
-                      }}
+      <AdvancedMarker
+        position={{
+          lat: props.member.lat as number,
+          lng: props.member.lng as number,
+        }}
+        key={props.member.id}
+        onClick={() => {
+          onSelect(props.member)
+          props.member.color = '#222222'
+        }}
       >
         <Pin
           background={background ?? '#0f9d58'}
@@ -38,7 +44,7 @@ const Marker: React.FC<MarkerProps> = (props: MarkerProps): React.ReactElement =
         />
       </AdvancedMarker>
     </div>
-  );
-};
+  )
+}
 
-export default Marker;
+export default Marker

@@ -12,7 +12,7 @@ const ImportDirectoryList = () => {
         <li>Select "Full Address" and check "Show Latitude/Longitude"</li>
         <li>Click print</li>
         <li>In the preview select all the text (ctrl-a) then copy it (ctrl-c)</li>
-        <li>Paste the content into the box below (ctr-v)</li>
+        <li>Paste the content into the box below (ctrl-v)</li>
       </ul>
       <Textarea {...register("data")} rows={20} />
     </>

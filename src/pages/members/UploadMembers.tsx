@@ -1,15 +1,15 @@
-import {Form} from '@/components/ui/form'
-import {getMemberList, saveMemberList} from '@/api'
-import type {Member} from '@/type'
-import {useQuery, useQueryClient} from '@tanstack/react-query'
-import React, {useState} from 'react'
+import { Form } from '@/components/ui/form'
+import { getMemberList, saveMemberList } from '@/api'
+import type { Member } from '@/type'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import React, { useState } from 'react'
 import UploadMembersDetail from './UploadMembersDetail'
 import MembersUpdate from './MembersUpdate'
-import {Button} from '@/components/ui/button';
-import {Tabs, TabsList, TabsTrigger, TabsContent} from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import ImportDirectoryList from './ImportDirectoryList'
-import {useForm} from 'react-hook-form'
-import {parseData} from './process.ts'
+import { useForm } from 'react-hook-form'
+import { parseData } from './process.ts'
 
 type FormType = {
   data: string
@@ -24,9 +24,9 @@ const UploadMembers = () => {
 
   const fileReader = new FileReader()
 
-  const {data: dbMemberList} = useQuery({
+  const { data: dbMemberList } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList,
+    queryFn: getMemberList
   })
 
   const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -34,10 +34,10 @@ const UploadMembers = () => {
   }
 
   const onSubmit = (data: FormType) => {
-    const parsedPersons = parseData(data.data);
-    console.log("parsedPerson", parsedPersons)
-    setMembers(parsedPersons)
-    form.setValue("people", parsedPersons)
+    const parsedPersons = parseData(data.data)
+    console.log('parsedPerson', parsedPersons)
+    setMembers(parsedPersons as Member[])
+    form.setValue('people', parsedPersons)
   }
 
   const csvFileToArray = (str: string) => {
@@ -57,7 +57,7 @@ const UploadMembers = () => {
         postalCode: Number(values[7]),
         phone: values[8],
         lat: Number(values[9]),
-        lng: Number(values[10]),
+        lng: Number(values[10])
       }
       return member
     })
@@ -66,12 +66,12 @@ const UploadMembers = () => {
   }
 
   const handleOnSubmit = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault()
 
     if (file) {
-      fileReader.onload = function (event) {
+      fileReader.onload = function(event) {
         const text = event.target?.result
         if (text) {
           csvFileToArray(text as string)
@@ -103,17 +103,17 @@ const UploadMembers = () => {
         if (found.address1 === m.address1) {
           existingMembers.push(m)
         } else {
-          changedMembers.push({old: found, updated: m})
+          changedMembers.push({ old: found, updated: m })
         }
       } else {
-        console.log("Did not match member", m.familyName, m.name)
+        console.log('Did not match member', m.familyName, m.name)
         m.id = crypto.randomUUID()
         newMembers.push(m)
       }
     })
     dbMemberList.forEach((dbMember) => {
       const found = members.find(
-        (uploadedMember) => uploadedMember.familyName === dbMember.familyName && uploadedMember.name === dbMember.name,
+        (uploadedMember) => uploadedMember.familyName === dbMember.familyName && uploadedMember.name === dbMember.name
       )
       if (!found) {
         removedMembers.push(dbMember)
@@ -124,32 +124,32 @@ const UploadMembers = () => {
   const insertNewMembers = () => {
     const updateList = dbMemberList ?? []
     newMembers?.forEach(m => {
-      console.log("Saving", m)
+      console.log('Saving', m)
       updateList.push(m)
       saveMemberList(updateList)
-      .catch(err => {
-        console.error(err, m)
-      })
+        .catch(err => {
+          console.error(err, m)
+        })
     })
-    queryClient.invalidateQueries({queryKey: ['members']})
+    queryClient.invalidateQueries({ queryKey: ['members'] })
     newMembers.length = 0
   }
 
   const deleteMembers = () => {
     const updateList: Member[] = dbMemberList ?? []
     const ids = removedMembers.map(m => m.id)
-    console.log("Deleting", ids)
+    console.log('Deleting', ids)
     saveMemberList(updateList.filter((m: Member) => !ids.includes(m.id)))
-    .catch(err => {
-      console.error(err, updateList, ids)
-    })
-    queryClient.invalidateQueries({queryKey: ['members']})
+      .catch(err => {
+        console.error(err, updateList, ids)
+      })
+    queryClient.invalidateQueries({ queryKey: ['members'] })
     newMembers.length = 0
     removedMembers.length = 0
   }
 
-  console.log("Matching members", existingMembers?.length ?? 0)
-  console.log("Changed members", changedMembers?.length ?? 0)
+  console.log('Matching members', existingMembers?.length ?? 0)
+  console.log('Changed members', changedMembers?.length ?? 0)
 
   return (
     <div className="p-4">
@@ -165,7 +165,7 @@ const UploadMembers = () => {
             <TabsContent value="web">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
-                  <ImportDirectoryList/>
+                  <ImportDirectoryList />
                   <Button type="submit">Process</Button>
                 </form>
               </Form>
@@ -195,7 +195,7 @@ const UploadMembers = () => {
       {(newMembers.length ?? 0) > 0 && (
         <>
           New members
-          <UploadMembersDetail members={newMembers}/>
+          <UploadMembersDetail members={newMembers} />
           <Button onClick={insertNewMembers}
                   className="p-2 mr-4 rounded outline outline-offset-2">Insert</Button>
         </>
@@ -203,7 +203,7 @@ const UploadMembers = () => {
       {(changedMembers.length ?? 0) > 0 && (
         <>
           Changed Members
-          <MembersUpdate members={changedMembers}/>
+          <MembersUpdate members={changedMembers} />
           <Button onClick={insertNewMembers}
                   className="p-2 mr-4 rounded outline outline-offset-2">Update</Button>
         </>
@@ -211,7 +211,7 @@ const UploadMembers = () => {
       {(removedMembers.length ?? 0) > 0 && (
         <>
           Removed Members
-          <UploadMembersDetail members={removedMembers}/>
+          <UploadMembersDetail members={removedMembers} />
           <Button onClick={deleteMembers}
                   className="p-2 mr-4 rounded outline outline-offset-2">Delete</Button>
         </>)}

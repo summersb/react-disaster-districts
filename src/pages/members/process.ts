@@ -13,7 +13,7 @@ export function parseData(data: string): Partial<Member>[] {
   const persons: Partial<Member>[] = []
 
   // Split the data into individual sections based on double newline characters
-  const sections = data.trim().split('\n\n')
+  const sections = data.trim().split('\n')
 
   // Regular expressions to match each section
   const headerRegex = /^[A-Za-z ]+ - \d*$/

@@ -10,7 +10,9 @@ export interface UserContextType {
   setUser: (user: UserType) => void
 }
 
-const AuthContext = createContext<UserContextType>({})
+const DEFAULT = {} as UserContextType;
+
+const AuthContext = createContext<UserContextType>(DEFAULT)
 
 type AuthProviderType = {
   children: React.ReactElement

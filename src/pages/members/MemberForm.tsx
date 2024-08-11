@@ -8,10 +8,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { useFormContext } from 'react-hook-form'
 
-type MemberFormProps = {
-}
-
-const MemberForm = (props: MemberFormProps) => {
+const MemberForm = () => {
   const { control } = useFormContext()
   return (
     <>

@@ -2,6 +2,28 @@ import { saveMember } from '@/api'
 import { Button } from '@/components/ui/button'
 import { Member } from '@/type'
 
+type FakePerson = {
+  location: {
+    street: {
+      number: string
+      name: string
+    }
+    city: string
+    state: string
+    country: string
+    postcode: number
+    coordinates: {
+      latitude: number
+      longitude: number
+    }
+  }
+  name: {
+    first: string
+    last: string
+  }
+  phone: string
+}
+
 const AddFakeMember = () => {
   const loadData = async () => {
     const json = await fetch('https://randomuser.me/api/?results=5', {
@@ -15,21 +37,20 @@ const AddFakeMember = () => {
         throw new Error(response.statusText)
       }
     })
-    json.results.forEach((results) => {
-      const addr = results.location
+    json.results.forEach((result: FakePerson) => {
+      const addr = result.location
       const member: Member = {
-        id: results.name.last + results.name.first,
-        familyName: results.name.last,
-        name: results.name.first,
+        id: result.name.last + result.name.first,
+        familyName: result.name.last,
+        name: result.name.first,
         formattedAddress: `${addr.street.number} ${addr.street.name}, ${addr.city},${addr.city}, ${addr.state} ${addr.postcode}, ${addr.country}`,
-        address1: results.location.street.name,
-        address2: null,
-        city: results.location.city,
-        state: results.location.state,
-        postalCode: results.location.postcode,
-        phone: results.phone,
-        lat: results.location.coordinates.latitude,
-        lng: results.location.coordinates.longitude,
+        address1: result.location.street.name,
+        city: result.location.city,
+        state: result.location.state,
+        postalCode: result.location.postcode,
+        phone: result.phone,
+        lat: result.location.coordinates.latitude,
+        lng: result.location.coordinates.longitude,
       }
       saveMember(member)
     })
