@@ -1,33 +1,37 @@
 import { Form } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import type { DistrictDbType } from '@/type'
+import type { District, DistrictDbType } from '@/type'
 import { DistrictSchema } from '@/type'
 import React from 'react'
 import { saveDistrict } from '@/api'
 import DistrictForm from './DistrictForm'
 
+const DEFAULT: Partial<DistrictDbType> = {
+  id: crypto.randomUUID(),
+  name: '',
+  leaderId: undefined,
+  assistantId: undefined,
+  color: '#FF5733',
+  members: []
+}
+
 const AddDistrict = (): React.ReactElement => {
   const form = useForm<DistrictDbType>({
     resolver: zodResolver(DistrictSchema),
-    defaultValues: {
-      id: crypto.randomUUID(),
-      name: '',
-      leader: undefined,
-      assistant: undefined,
-      members: [],
-    } as Partial<DistrictDbType>,
+    defaultValues: DEFAULT
   })
 
   const onSubmit = (data: DistrictDbType): Promise<void> =>
     saveDistrict(data)
       .then((d) => {
+        form.reset(DEFAULT)
         console.log('created', d)
       })
       .catch((err) => {
         form.setError('name', {
           type: 'custom',
-          message: err.message,
+          message: err.message
         })
       })
 

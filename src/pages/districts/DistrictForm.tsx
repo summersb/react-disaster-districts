@@ -27,9 +27,14 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import MapDisplay from '@/pages/map/MapDisplay'
 import { useQuery } from '@tanstack/react-query'
 import { getDistrictList, getMemberList } from '@/api'
-import type { Member } from '@/type'
+import type { DistrictDbType, Member } from '@/type'
+import { ColorPicker } from '@/components/ColorPicker.tsx'
 
-const DistrictForm = () => {
+interface DistrictFormProps {
+  district?: DistrictDbType
+}
+
+const DistrictForm = ({ district }: DistrictFormProps) => {
   const [openLeader, setOpenLeader] = useState(false)
   const [openAssistant, setOpenAssistant] = useState(false)
   const form = useFormContext()
@@ -51,13 +56,17 @@ const DistrictForm = () => {
   const leader = form.getValues('leader')
   const assistant = form.getValues('assistant')
 
-  console.log('leader', leader)
+  const memberClicked = (member: Member) => {
+    if (district) {
+      member.color = district.color
+      console.log('clicked', member.color)
+    }
+  }
 
   const memberList: Member[] = data ?? []
 
   const leaderList = memberList?.filter((m) => m.id !== assistant?.id ?? '')
   const assistantList = memberList?.filter((m) => m.id !== leader?.id ?? '')
-  console.log('assistantList', assistantList)
   return (
     <>
       <div className="mb-4">
@@ -72,7 +81,7 @@ const DistrictForm = () => {
                   <Input
                     placeholder="District name"
                     {...field}
-                    className="text-white bg-gray-500"
+                    className="text-white bg-gray-900"
                   />
                 </div>
               </FormControl>
@@ -82,6 +91,26 @@ const DistrictForm = () => {
         />
       </div>
 
+      <div className="mb-4">
+        <FormField
+          control={form.control}
+          name="color"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Color</FormLabel>
+              <FormControl>
+                <div className="mb-4 text-black bg-slate-500">
+                  <ColorPicker selectedColor={field.value} setSelectedColor={(color) => {
+                    form.setValue('color', color)
+                  }}
+                               className="text-white bg-gray-900"
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+      </div>
       <div className="mb-4">
         <FormLabel
           className={cn(form.formState.errors.leader && 'text-destructive')}
@@ -235,6 +264,8 @@ const DistrictForm = () => {
               members={memberList}
               lat={leader?.lat ?? 33.1928423}
               lng={leader?.lng ?? -117.2413057}
+              leader={leader}
+              markerClicked={memberClicked}
             />
           </div>
         )}
