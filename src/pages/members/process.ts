@@ -1,4 +1,4 @@
-import type {Member, Result} from '@/type'
+import type { Member, Result } from '@/type'
 
 enum Mode {
   name,
@@ -18,6 +18,7 @@ export function parseData(data: string): Partial<Member>[] {
   // Regular expressions to match each section
   const headerRegex = /^[A-Za-z ]+ - \d*$/
   const separatorRegex = /^[A-Z]$/
+  const footerRegex = /^https.*$/
   const nameAddressRegex =
     /^([A-Za-z\-\s]+),\s([()A-Za-z&.\s]+)\s?(\d+\s*[A-Za-z0-9-/#.\s]*)?$/
   const cityRegex = /^(Vista|VISTA|San Marcos),\s([A-Za-z]+)\s(\d*)\s?-?(\d*)?$/
@@ -30,7 +31,14 @@ export function parseData(data: string): Partial<Member>[] {
     if (header) {
       return
     }
+    const footer = footerRegex.exec(section)
+    if (footer) {
+      return
+    }
     if (section.includes('All rights reserved')) {
+      return
+    }
+    if (section.includes('Ward Directory and Map')) {
       return
     }
     if (separatorRegex.exec(section)) {
@@ -42,7 +50,7 @@ export function parseData(data: string): Partial<Member>[] {
 
     if (member.familyName && nameAddressMatch && !cityMatch) {
       mode = Mode.unk
-      console.log("Pushed person", member)
+      console.log('Pushed person', member)
       persons.push(member as Member)
       member = {}
     }
@@ -79,40 +87,41 @@ export function parseData(data: string): Partial<Member>[] {
       member.lng = Number(latLngMatch[2])
       return
     }
-    console.log("No match found", section)
+    console.log('No match found', section)
   })
 
   if (member.familyName) {
-    console.log("last person", member)
+    console.log('last person', member)
     persons.push(member)
   }
   return persons
 }
 
-
 export const resolveAddress = async (address: string): Promise<Result> =>
   fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}`,
   )
-  .then((res) => {
-    if (res.ok) {
-      return res.json()
-    } else {
-      throw new Error('Error resolving ' + res.statusText)
-    }
-  })
-  .then((json) => {
-    if (json.status === 'OK') {
-      return json.results[0]
-    } else {
-      throw new Error('Could not resolve address' + address)
-    }
-  })
-  .catch((e) => {
-    alert(e.message)
-  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        throw new Error('Error resolving ' + res.statusText)
+      }
+    })
+    .then((json) => {
+      if (json.status === 'OK') {
+        return json.results[0]
+      } else {
+        throw new Error('Could not resolve address' + address)
+      }
+    })
+    .catch((e) => {
+      alert(e.message)
+    })
 
-export const getGeo = async (member: Partial<Member>): Promise<Partial<Member>> => {
+export const getGeo = async (
+  member: Partial<Member>,
+): Promise<Partial<Member>> => {
   if (member.lat === undefined || member.lng === undefined) {
     const address = await resolveAddress(
       `${member.address1},${member.address2 === '' ? '' : member.address2 + ','}${member.city},${member.state}`,
@@ -124,7 +133,7 @@ export const getGeo = async (member: Partial<Member>): Promise<Partial<Member>> 
     member.postalCode = parseInt(
       address?.address_components?.find(
         (addressComponent) => addressComponent.types[0] === 'postal_code',
-      )?.long_name ?? "0",
+      )?.long_name ?? '0',
     )
   }
 

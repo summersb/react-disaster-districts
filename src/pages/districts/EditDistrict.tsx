@@ -1,6 +1,4 @@
-import {
-  Form
-} from '@/components/ui/form'
+import { Form } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm, UseFormReset } from 'react-hook-form'
 import type { District, DistrictDbType, Member } from '@/type'
@@ -17,41 +15,35 @@ const EditDistrict = (): React.ReactElement => {
   const form = useForm<District>({
     resolver: zodResolver(DistrictSchema),
     defaultValues: {
-      id: undefined,
-      name: undefined,
-      leader: undefined,
-      assistant: undefined,
-      members: []
-    }
+      id: 'pending',
+      name: '',
+      members: [],
+    },
   })
 
   const { data: members } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
-
 
   const convertDbDistrict = (): Promise<District> =>
     getDistrict(districtId as string).then((db: DistrictDbType) => {
       return {
         id: db.id,
         name: db.name,
-        leader: members?.find(m => m.id == db.leaderId),
-        assistant: members?.find(m => m.id == db.assistantId),
+        leader: members?.find((m) => m.id == db.leaderId),
+        assistant: members?.find((m) => m.id == db.assistantId),
         color: db.color,
-        members: members?.filter(m => db.members?.includes(m.id))
+        members: members?.filter((m) => db.members?.includes(m.id)),
       } as District
     })
-
 
   const { data } = useQuery({
     queryKey: ['district', districtId],
     queryFn: convertDbDistrict,
     enabled: districtId !== undefined && members !== undefined,
-    retry: false
+    retry: false,
   })
-
-  console.log('district', data)
 
   useEffect(() => {
     if (data) {
@@ -65,17 +57,17 @@ const EditDistrict = (): React.ReactElement => {
       name: data.name,
       leaderId: data.leader.id,
       color: data.color,
-      members: []
+      members: data.members?.map((m) => m.id) ?? [],
     }
     dbDistrict.assistantId = data?.assistant?.id ?? undefined
     saveDistrict(dbDistrict)
-      .then(d => {
+      .then((d) => {
         console.log('created', d)
       })
       .catch((err: Error) => {
         form.setError('name', {
           type: 'custom',
-          message: err.message
+          message: err.message,
         })
       })
   }
@@ -90,12 +82,8 @@ const EditDistrict = (): React.ReactElement => {
         <h2 className="text-xl font-semibold mb-4">Create District</h2>
 
         <Form {...form}>
-
-          <form action="#"
-                onSubmit={form.handleSubmit(onSubmit)}
-                method="POST">
-
-            <DistrictForm district={data} />
+          <form action="#" onSubmit={form.handleSubmit(onSubmit)} method="POST">
+            <DistrictForm />
 
             <div className="text-gray-700 mb-4">
               <button
@@ -105,7 +93,6 @@ const EditDistrict = (): React.ReactElement => {
                 Save
               </button>
             </div>
-
           </form>
         </Form>
       </div>
@@ -114,4 +101,3 @@ const EditDistrict = (): React.ReactElement => {
 }
 
 export default EditDistrict
-

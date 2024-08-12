@@ -4,7 +4,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,13 +13,13 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-  CommandList
+  CommandList,
 } from '@/components/ui/command'
 import { CommandInput } from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from '@/components/ui/popover'
 import { useFormContext, useFieldArray } from 'react-hook-form'
 import { cn } from '@/lib/utils'
@@ -27,39 +27,45 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import MapDisplay from '@/pages/map/MapDisplay'
 import { useQuery } from '@tanstack/react-query'
 import { getDistrictList, getMemberList } from '@/api'
-import type { District, Member } from '@/type'
+import type { Member } from '@/type'
 import { ColorPicker } from '@/components/ColorPicker.tsx'
 
-interface DistrictFormProps {
-  district?: District
-}
-
-const DistrictForm = ({ district }: DistrictFormProps) => {
+const DistrictForm = () => {
   const [openLeader, setOpenLeader] = useState(false)
   const [openAssistant, setOpenAssistant] = useState(false)
   const form = useFormContext()
-  const { fields: districtMembers } = useFieldArray({
+  const {
+    fields: districtMembers,
+    append,
+    remove,
+  } = useFieldArray({
     control: form.control,
-    name: 'members'
+    name: 'members',
+    keyName: '_id',
   })
 
   const { data } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
 
   const { data: districts } = useQuery({
     queryKey: ['districts'],
-    queryFn: getDistrictList
+    queryFn: getDistrictList,
   })
 
   const leader = form.getValues('leader')
   const assistant = form.getValues('assistant')
 
   const memberClicked = (member: Member) => {
-    if (district) {
-      member.color = district.color
-      console.log('clicked', member.color)
+    if (districtMembers.find((m) => m.id === member.id)) {
+      districtMembers.forEach((m, idx) => {
+        if (m.id === member.id) {
+          remove(idx)
+        }
+      })
+    } else {
+      append(member)
     }
   }
 
@@ -100,16 +106,19 @@ const DistrictForm = ({ district }: DistrictFormProps) => {
               <FormLabel>Color</FormLabel>
               <FormControl>
                 <div className="mb-4 text-black bg-slate-500">
-                  <ColorPicker selectedColor={field.value} setSelectedColor={(color) => {
-                    form.setValue('color', color)
-                  }}
-                               className="text-white bg-gray-900"
+                  <ColorPicker
+                    selectedColor={field.value}
+                    setSelectedColor={(color) => {
+                      form.setValue('color', color)
+                    }}
+                    className="text-white bg-gray-900"
                   />
                 </div>
               </FormControl>
               <FormMessage />
             </FormItem>
-          )} />
+          )}
+        />
       </div>
       <div className="mb-4">
         <FormLabel
@@ -146,7 +155,7 @@ const DistrictForm = ({ district }: DistrictFormProps) => {
                         member.familyName,
                         member.name,
                         member.address1 ?? '',
-                        member?.formattedAddress ?? ''
+                        member?.formattedAddress ?? '',
                       ]}
                       onSelect={() => {
                         form.setValue('leader', member)
@@ -158,7 +167,7 @@ const DistrictForm = ({ district }: DistrictFormProps) => {
                           'mr-2 h-4 w-4',
                           leader?.id === member.id
                             ? 'opacity-100'
-                            : 'opacity-0'
+                            : 'opacity-0',
                         )}
                       />
                       <span>
@@ -209,7 +218,7 @@ const DistrictForm = ({ district }: DistrictFormProps) => {
                         member.familyName,
                         member.name,
                         member.address1 ?? '',
-                        member.formattedAddress ?? ''
+                        member.formattedAddress ?? '',
                       ]}
                       onSelect={() => {
                         form.setValue('assistant', member)
@@ -221,7 +230,7 @@ const DistrictForm = ({ district }: DistrictFormProps) => {
                           'mr-2 h-4 w-4',
                           assistant?.id === member.id
                             ? 'opacity-100'
-                            : 'opacity-0'
+                            : 'opacity-0',
                         )}
                       />
                       <span>
@@ -252,8 +261,10 @@ const DistrictForm = ({ district }: DistrictFormProps) => {
       <div className="flex mb-4 h-[500px]">
         <div className="w-1/2 mr-2">
           <ul>
-            {districtMembers?.map((m: Record<string, string>, idx: number) => (
-              <li key={idx}>{m.toString()}</li>
+            {districtMembers?.map((field, idx: number) => (
+              <li key={idx}>
+                {field.familyName}, {field.name}
+              </li>
             ))}
           </ul>
         </div>
