@@ -1,7 +1,8 @@
 import React from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import type { Member } from '@/type'
+import L from 'leaflet'
+import type { District, Member } from '@/type'
 
 type Position = {
   lat: number
@@ -15,6 +16,7 @@ function ChangeView(center: Position) {
 }
 
 type MapWithMarkersProps = {
+  districts: District[]
   members: Member[]
   center: Position
   markerClicked?: (member: Member) => void
@@ -26,6 +28,28 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
       props.markerClicked(member)
     }
   }
+
+  const getMemberColor = (memberId: string): string => {
+    // check if member is leader
+    const leaderColor = props.districts?.find(d => d.leaderId === memberId)?.color
+    const color = props.districts?.find(d => d.members.includes(memberId))?.color
+    return leaderColor ?? color ?? 'Blue'
+  }
+
+  function getMemberIcon(member: Member): L.Icon {
+    const color = getMemberColor(member.id)
+
+    return new L.Icon({
+      iconUrl: `/images/${color}.svg`,
+      iconSize: [25, 41], // size of the icon
+      iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+      popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
+      shadowUrl:
+        'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      shadowSize: [41, 41]
+    })
+  }
+
   return (
     <MapContainer
       center={[props.center.lat, props.center.lng]}
@@ -43,7 +67,9 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
           key={member.id}
           position={[member.lat ?? 0, member.lng ?? 0]}
           eventHandlers={{ click: () => markerClicked(member) }}
-        ></Marker>
+          icon={getMemberIcon(member)}
+        > <Tooltip direction="right" offset={[0, 20]} opacity={.5} permanent
+                   onClick={() => markerClicked(member)}>{member.familyName}</Tooltip></Marker>
       ))}
     </MapContainer>
   )

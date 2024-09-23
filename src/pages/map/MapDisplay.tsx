@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
-import { getMemberList } from '@/api'
+import { getDistrictList, getMemberList } from '@/api'
 import { DistrictDbType, Member } from '@/type'
 import OSMMapWithMarkers from '@/components/OSMMapWithMarkers.tsx'
 
@@ -24,6 +24,10 @@ const MapDisplay = ({
     queryFn: getMemberList,
     retry: false
   })
+  const { data: districts } = useQuery({
+    queryKey: ['districts'],
+    queryFn: getDistrictList
+  })
 
   if (isError) {
     alert(error)
@@ -36,7 +40,7 @@ const MapDisplay = ({
   }
   return (
     <div className="h-full">
-      {m && <OSMMapWithMarkers members={m} center={center} markerClicked={markerClicked} />}
+      {m && <OSMMapWithMarkers districts={districts} members={m} center={center} markerClicked={markerClicked} />}
     </div>
   )
 }

@@ -1,5 +1,5 @@
-import {z} from "zod"
-import {BaseObject} from "@/type/SharedTypes.ts";
+import { z } from 'zod'
+import { BaseObject } from '@/type/SharedTypes.ts'
 
 export const MemberSchema = z.object({
   id: z.string().uuid(),
@@ -13,8 +13,7 @@ export const MemberSchema = z.object({
   postalCode: z.number().optional(),
   phone: z.string().optional(),
   lat: z.number().optional(),
-  lng: z.number().optional(),
-  color: z.string().optional(),
+  lng: z.number().optional()
 })
 
 export type Member = z.infer<typeof MemberSchema> & BaseObject

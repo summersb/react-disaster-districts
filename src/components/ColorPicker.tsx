@@ -24,18 +24,20 @@ const colors = [
   { name: 'Bright Green', value: '#8FFF33' }
 ]
 
-export interface ColorPickerProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface ColorPickerProps
+  extends React.SelectHTMLAttributes<HTMLSelectElement> {
   selectedColor: string
   setSelectedColor: (color: string) => void
 }
 
-const ColorPicker = React.forwardRef<HTMLSelectElement, ColorPickerProps>(({
-                                                                             className,
-                                                                             selectedColor,
-                                                                             setSelectedColor,
-                                                                             ...props
-                                                                           }, ref): React.ReactElement => {
-    const selectedColorObj = colors.find(color => color.value === selectedColor)
+const ColorPicker = React.forwardRef<HTMLSelectElement, ColorPickerProps>(
+  (
+    { className, selectedColor, setSelectedColor, ...props },
+    ref
+  ): React.ReactElement => {
+    const selectedColorObj = colors.find(
+      (color) => color.name === selectedColor
+    )
     return (
       <select
         value={selectedColor}
@@ -49,7 +51,7 @@ const ColorPicker = React.forwardRef<HTMLSelectElement, ColorPickerProps>(({
         {...props}
       >
         {colors.map((color, index) => (
-          <option key={index} value={color.value} style={{ color: color.value }}>
+          <option key={index} value={color.name} style={{ color: color.value }}>
             {color.name}
           </option>
         ))}

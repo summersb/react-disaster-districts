@@ -8,10 +8,10 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog.tsx'
-import { deleteDistrict } from '@/api'
-import { useQueryClient } from '@tanstack/react-query'
+import { deleteDistrict, getMemberList } from '@/api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { FilePenLine, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -23,6 +23,11 @@ export default function District(props: DistrictProps) {
   const { district: d } = props
   const [open, setOpen] = useState<boolean>(false)
   const queryClient = useQueryClient()
+
+  const { data } = useQuery({
+    queryKey: ['members'],
+    queryFn: getMemberList
+  })
 
   const delDistrict = () => {
     setOpen(true)
@@ -37,6 +42,8 @@ export default function District(props: DistrictProps) {
     setOpen(false)
   }
 
+  const leaderName = data?.findLast(m => m.id == d.leaderId).familyName
+  const assistantName = data?.findLast(m => m.id == d.assistantId)?.familyName
   return (
     <TableRow>
       <TableCell>
@@ -47,8 +54,8 @@ export default function District(props: DistrictProps) {
         </Link>
       </TableCell>
       <TableCell>{d.name}</TableCell>
-      <TableCell>{d.leaderId}</TableCell>
-      <TableCell>{d.assistantId}</TableCell>
+      <TableCell>{leaderName}</TableCell>
+      <TableCell>{assistantName}</TableCell>
       <TableCell>
         <Trash2 onClick={delDistrict} />
         <Dialog open={open} onOpenChange={setOpen}>
