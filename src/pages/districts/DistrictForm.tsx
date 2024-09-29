@@ -265,7 +265,7 @@ const DistrictForm = () => {
           <div className="flex mb-4 h-[500px]">
             <div className="w-1/2 mr-2">
               <ul>
-                {districtMembers?.map((field, idx: number) => (
+                {districtMembers?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName)).map((field, idx: number) => (
                   <li key={idx}>
                     {field.familyName}, {field.name}
                   </li>
@@ -283,6 +283,7 @@ const DistrictForm = () => {
               lng={leader?.lng ?? -117.2413057}
               leader={leader}
               markerClicked={memberClicked}
+              showLabel
             />
           </div>
         )}

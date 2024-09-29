@@ -1,11 +1,12 @@
 import {
   HardDriveUpload,
   Map,
+  Rows3,
   School,
   School2,
   Settings,
   User,
-  Users,
+  Users
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -36,6 +37,10 @@ const Sidebar = () => {
       <div className="flex flex-row">
         <School2 />
         <Link to="/adddistrict">Add Districts</Link>
+      </div>
+      <div className="flex flex-row">
+        <Rows3 />
+        <Link to="/viewdistrict">Print Districts</Link>
       </div>
       <div className="flex flex-row">
         <Users /> <Link to="/members">Members</Link>

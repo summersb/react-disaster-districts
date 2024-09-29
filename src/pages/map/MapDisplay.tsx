@@ -11,13 +11,15 @@ type MapDisplayProps = {
   members?: Member[]
   leader?: Member
   markerClicked?: (member: Member) => void
+  showLabel: boolean
 }
 
 const MapDisplay = ({
                       members,
                       lat = 33.1928423,
                       lng = -117.2413057,
-                      markerClicked
+                      markerClicked,
+                      showLabel
                     }: MapDisplayProps): React.ReactElement => {
   const { data, isError, error } = useQuery({
     queryKey: ['members'],
@@ -40,7 +42,8 @@ const MapDisplay = ({
   }
   return (
     <div className="h-full">
-      {m && <OSMMapWithMarkers districts={districts} members={m} center={center} markerClicked={markerClicked} />}
+      {m && <OSMMapWithMarkers districts={districts} members={m} center={center} markerClicked={markerClicked}
+                               showLabel={showLabel} />}
     </div>
   )
 }

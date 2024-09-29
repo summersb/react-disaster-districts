@@ -9,13 +9,14 @@ import Home from './pages/home/Home'
 import RequireAuth from './components/RequireAuth'
 import Login from './pages/home/Login'
 import { auth } from '@/api'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import MemberList from './pages/members/MemberList'
 import Settings from './pages/settings/Settings'
 import UploadMembers from './pages/members/UploadMembers'
 import AddFakeMember from './pages/members/AddFakeMember'
-import AddDistrict from "@/pages/districts/AddDistrict";
-import EditDistrict from "@/pages/districts/EditDistrict";
+import AddDistrict from '@/pages/districts/AddDistrict'
+import EditDistrict from '@/pages/districts/EditDistrict'
+import ViewAllDistricts from '@/pages/districts/ViewAllDistricts'
 
 function App() {
   const { setUser } = useAuth()
@@ -39,12 +40,13 @@ function App() {
           <Route path="districts" element={<Districts />} />
           <Route path="adddistrict" element={<AddDistrict />} />
           <Route path="district/:districtId" element={<EditDistrict />} />
+          <Route path="viewdistrict" element={<ViewAllDistricts />} />
           <Route path="members" element={<MemberList />} />
           <Route path="addmember" element={<AddMember />} />
           <Route path="editmember/:memberId" element={<EditMember />} />
           <Route path="upload" element={<UploadMembers />} />
           <Route path="fakedata" element={<AddFakeMember />} />
-          <Route path="map" element={ <div className="h-screen" > <MapDisplay /> </div> } /> 
+          <Route path="map" element={<div className="h-screen"><MapDisplay /></div>} />
           <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Home />} />

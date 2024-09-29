@@ -30,6 +30,7 @@
     "cmdk": "^1.0.0",
     "firebase": "^10.12.5",
     "firebaseui": "^6.1.0",
+    "haversine": "^1.1.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.340.0",
     "react": "^18.3.1",

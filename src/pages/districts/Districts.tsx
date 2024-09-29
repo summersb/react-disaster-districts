@@ -1,5 +1,5 @@
-import {getDistrictList} from '@/api'
-import {useQuery} from '@tanstack/react-query'
+import { getDistrictList } from '@/api'
+import { useQuery } from '@tanstack/react-query'
 import District from './District'
 import {
   Table,
@@ -7,13 +7,13 @@ import {
   TableCaption,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table'
 
 export default function Districts() {
-  const {data} = useQuery({
+  const { data } = useQuery({
     queryKey: ['districts'],
-    queryFn: getDistrictList,
+    queryFn: getDistrictList
   })
 
   return (
@@ -29,8 +29,8 @@ export default function Districts() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data && data.map(d => (
-          <District key={d.id} district={d}/>
+        {data && data.sort((d1, d2) => d1.name.localeCompare(d2.name)).map(d => (
+          <District key={d.id} district={d} />
         ))}
       </TableBody>
     </Table>

@@ -3,6 +3,7 @@ import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import type { District, Member } from '@/type'
+import haversine from 'haversine'
 
 type Position = {
   lat: number
@@ -20,6 +21,23 @@ type MapWithMarkersProps = {
   members: Member[]
   center: Position
   markerClicked?: (member: Member) => void
+  showLabel: boolean
+}
+
+const declutter = (members: Member[]): Member[] => {
+  return members.map(m => {
+    const start = { latitude: m.lat, longitude: m.lng }
+    const toClose = members.filter(mm => mm.id !== m.id)
+      .find(otherM => {
+        const end = { latitude: otherM.lat, longitude: otherM.lng }
+        const distance = haversine(start, end)
+        return distance < 0.01
+      })
+    if (toClose) {
+      m.lat += .0005
+    }
+    return m
+  })
 }
 
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
@@ -62,14 +80,17 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ChangeView lat={props.center.lat} lng={props.center.lng} />
-      {props.members.map((member: Member) => (
+      {declutter(props.members).map((member: Member) => (
         <Marker
           key={member.id}
           position={[member.lat ?? 0, member.lng ?? 0]}
           eventHandlers={{ click: () => markerClicked(member) }}
           icon={getMemberIcon(member)}
-        > <Tooltip direction="right" offset={[0, 20]} opacity={.5} permanent
-                   onClick={() => markerClicked(member)}>{member.familyName}</Tooltip></Marker>
+        >
+          {props.showLabel && <Tooltip direction="right" offset={[0, 20]} opacity={.5}
+                                       permanent>{member.familyName}, {member.name}</Tooltip>
+          }
+        </Marker>
       ))}
     </MapContainer>
   )

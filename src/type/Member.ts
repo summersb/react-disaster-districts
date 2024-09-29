@@ -12,8 +12,8 @@ export const MemberSchema = z.object({
   state: z.string().optional(),
   postalCode: z.number().optional(),
   phone: z.string().optional(),
-  lat: z.number().optional(),
-  lng: z.number().optional()
+  lat: z.preprocess((val) => val === '' ? undefined : Number(val), z.number().optional()),
+  lng: z.preprocess((val) => val === '' ? undefined : Number(val), z.number().optional())
 })
 
 export type Member = z.infer<typeof MemberSchema> & BaseObject
