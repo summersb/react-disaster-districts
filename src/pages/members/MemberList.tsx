@@ -1,5 +1,5 @@
-import {useQuery, useQueryClient} from '@tanstack/react-query'
-import {getMemberList, deleteMember} from '@/api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getMemberList, deleteMember, getDistrictList } from '@/api'
 import {
   Table,
   TableBody,
@@ -7,67 +7,72 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import CsvDownloader from 'react-csv-downloader'
-import {FilePenLine, Trash2} from "lucide-react";
+import { FilePenLine, Trash2 } from 'lucide-react'
 import {
   Dialog, DialogClose,
   DialogContent, DialogDescription, DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog.tsx";
-import {useState} from "react";
-import {Button} from "@/components/ui/button.tsx";
+  DialogTitle
+} from '@/components/ui/dialog.tsx'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button.tsx'
 
 const MemberList = () => {
   const [open, setOpen] = useState(false)
   const [id, setId] = useState<string>()
   const queryClient = useQueryClient()
-  const {data} = useQuery({
+  const { data } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList,
+    queryFn: getMemberList
+  })
+
+  const { data: districts } = useQuery({
+    queryKey: ['districts'],
+    queryFn: getDistrictList
   })
 
   const deleteMembe = () => {
     if (id) {
       deleteMember(id).then(() => {
         setOpen(false)
-        queryClient.invalidateQueries({queryKey: ['members']})
+        queryClient.invalidateQueries({ queryKey: ['members'] })
       })
-      .catch(e => {
-        setOpen(false)
-        alert(e.message)
+        .catch(e => {
+          setOpen(false)
+          alert(e.message)
 
-      })
+        })
     }
   }
 
   const columns = [
     {
       id: 'familyName',
-      displayName: 'Surname',
+      displayName: 'Surname'
     },
     {
       id: 'name',
-      displayName: 'Name',
+      displayName: 'Name'
     },
-    {id: 'formattedAddress', displayName: 'Formatted Address'},
-    {id: 'address1', displayName: 'Address1'},
-    {id: 'address2', displayName: 'Address2'},
-    {id: 'city', displayName: 'City'},
-    {id: 'state', displayName: 'State'},
-    {id: 'postalCode', displayName: 'Postal Code'},
-    {id: 'phone', displayName: 'Phone'},
+    { id: 'formattedAddress', displayName: 'Formatted Address' },
+    { id: 'address1', displayName: 'Address1' },
+    { id: 'address2', displayName: 'Address2' },
+    { id: 'city', displayName: 'City' },
+    { id: 'state', displayName: 'State' },
+    { id: 'postalCode', displayName: 'Postal Code' },
+    { id: 'phone', displayName: 'Phone' },
     {
       id: 'lat',
-      displayName: 'Latitude',
+      displayName: 'Latitude'
     },
     {
       id: 'lng',
-      displayName: 'Longitude',
-    },
+      displayName: 'Longitude'
+    }
   ]
   return (
     <>
@@ -87,6 +92,7 @@ const MemberList = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Edit</TableHead>
+            <TableHead>District</TableHead>
             <TableHead>Surname</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Formatted Address</TableHead>
@@ -112,10 +118,12 @@ const MemberList = () => {
               }
               return 0
             }).map((m) => {
+              const district = districts?.find(d => d.members.includes(m.id))?.name
               return (
                 <TableRow key={m.id}
                           className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                  <TableCell><Link to={`/editmember/${m.id}`}><FilePenLine/></Link></TableCell>
+                  <TableCell><Link to={`/editmember/${m.id}`}><FilePenLine /></Link></TableCell>
+                  <TableCell>{district}</TableCell>
                   <TableCell>{m.familyName}</TableCell>
                   <TableCell>{m.name}</TableCell>
                   <TableCell>{m.formattedAddress}</TableCell>
@@ -128,9 +136,9 @@ const MemberList = () => {
                   <TableCell>{m.lat}</TableCell>
                   <TableCell>{m.lng}</TableCell>
                   <TableCell><Trash2 onClick={() => {
-                    setId(m.id);
-                    setOpen(true);
-                  }}/></TableCell>
+                    setId(m.id)
+                    setOpen(true)
+                  }} /></TableCell>
                 </TableRow>
               )
             })}

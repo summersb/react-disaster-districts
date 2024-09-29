@@ -42,8 +42,10 @@ export default function District(props: DistrictProps) {
     setOpen(false)
   }
 
-  const leaderName = data?.findLast(m => m.id == d.leaderId).familyName
-  const assistantName = data?.findLast(m => m.id == d.assistantId)?.familyName
+  const leader = data?.findLast(m => m.id == d.leaderId)
+  const leaderName = `${leader.familyName}, ${leader.name}`
+  const assistant = data?.findLast(m => m.id == d.assistantId)
+  const assistantName = assistant ? `${assistant?.familyName}, ${assistant?.name}` : ''
   return (
     <TableRow>
       <TableCell>
