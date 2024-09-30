@@ -17,13 +17,13 @@ const EditDistrict = (): React.ReactElement => {
     defaultValues: {
       id: 'pending',
       name: '',
-      members: [],
-    },
+      members: []
+    }
   })
 
   const { data: members } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList,
+    queryFn: getMemberList
   })
 
   const convertDbDistrict = (): Promise<District> =>
@@ -34,7 +34,7 @@ const EditDistrict = (): React.ReactElement => {
         leader: members?.find((m) => m.id == db.leaderId),
         assistant: members?.find((m) => m.id == db.assistantId),
         color: db.color,
-        members: members?.filter((m) => db.members?.includes(m.id)),
+        members: members?.filter((m) => db.members?.includes(m.id))
       } as District
     })
 
@@ -42,7 +42,7 @@ const EditDistrict = (): React.ReactElement => {
     queryKey: ['district', districtId],
     queryFn: convertDbDistrict,
     enabled: districtId !== undefined && members !== undefined,
-    retry: false,
+    retry: false
   })
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const EditDistrict = (): React.ReactElement => {
       name: data.name,
       leaderId: data.leader.id,
       color: data.color,
-      members: data.members?.map((m) => m.id) ?? [],
+      members: data.members?.map((m) => m.id) ?? []
     }
     dbDistrict.assistantId = data?.assistant?.id ?? undefined
     saveDistrict(dbDistrict)
@@ -67,7 +67,7 @@ const EditDistrict = (): React.ReactElement => {
       .catch((err: Error) => {
         form.setError('name', {
           type: 'custom',
-          message: err.message,
+          message: err.message
         })
       })
   }
@@ -79,7 +79,7 @@ const EditDistrict = (): React.ReactElement => {
   return (
     <div className="h-full flex flex-col items-center justify-center">
       <div className="w-full rounded p-6 shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Create District</h2>
+        <h2 className="text-xl font-semibold mb-4">Edit District</h2>
 
         <Form {...form}>
           <form action="#" onSubmit={form.handleSubmit(onSubmit)} method="POST">

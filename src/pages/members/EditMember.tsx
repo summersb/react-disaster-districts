@@ -1,20 +1,20 @@
-import {useState} from 'react'
-import {useParams, Link, useNavigate} from 'react-router-dom'
-import {useQuery} from '@tanstack/react-query'
-import {zodResolver} from '@hookform/resolvers/zod'
-import {Form} from '@/components/ui/form'
-import {SubmitHandler, useForm} from 'react-hook-form'
-import {Button} from '@/components/ui/button'
-import {getMember, saveMember} from '@/api'
-import {MemberSchema} from '@/type'
-import type {Member} from '@/type'
+import { useState } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Form } from '@/components/ui/form'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
+import { getMember, saveMember } from '@/api'
+import { MemberSchema } from '@/type'
+import type { Member } from '@/type'
 import MemberForm from './MemberForm'
-import {getGeo} from "@/pages/members/process.ts";
+import { getGeo } from '@/pages/members/process.ts'
 
 const EditMember = () => {
-  const {memberId} = useParams()
+  const { memberId } = useParams()
   const navigate = useNavigate()
-  const {data} = useQuery({
+  const { data } = useQuery({
     queryKey: ['member', memberId],
     queryFn: () => getMember(memberId as string),
     enabled: memberId !== undefined,
@@ -33,6 +33,9 @@ const EditMember = () => {
     saveMember(m as Member).then(() => {
       navigate('/members')
     }).catch((e: Error) => {
+      saveMember(data).then(() => {
+        navigate('/members')
+      })
       setError(e.message)
     })
   }
@@ -46,7 +49,7 @@ const EditMember = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-2/3 space-y-6"
         >
-          <MemberForm/>
+          <MemberForm />
           <Button
             variant="outline"
             disabled={form.formState.isSubmitting}
@@ -54,7 +57,7 @@ const EditMember = () => {
           >
             Save Member
           </Button>
-          <Link to='/members'>
+          <Link to="/members">
             <Button
               variant="outline"
               disabled={form.formState.isSubmitting}
@@ -64,7 +67,7 @@ const EditMember = () => {
           </Link>
         </form>
       </Form>
-      <Link to='/members'><Button>Back</Button></Link>
+      <Link to="/members"><Button>Back</Button></Link>
     </>
 
   )

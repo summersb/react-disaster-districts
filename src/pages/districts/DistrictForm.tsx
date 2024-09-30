@@ -77,7 +77,7 @@ const DistrictForm = () => {
   return (
     <>
       <div className="flex mb-4 ">
-        <div className="w-1/2 ml-2">
+        <div className="w-1/4 ml-2">
           <div className="mb-4">
             <FormField
               control={form.control}
@@ -265,17 +265,18 @@ const DistrictForm = () => {
           <div className="flex mb-4 h-[500px]">
             <div className="w-1/2 mr-2">
               <ul>
-                {districtMembers?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName)).map((field, idx: number) => (
-                  <li key={idx}>
-                    {field.familyName}, {field.name}
-                  </li>
-                ))}
+                {districtMembers?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
+                  .map((field, idx: number) => (
+                    <li className="odd:bg-slate-700 even:bg-slate-900 " key={idx}>
+                      {field.familyName}, {field.name}
+                    </li>
+                  ))}
               </ul>
             </div>
           </div>
         </div>
         {districts && (
-          <div className="w-1/2 ml-2">
+          <div className="w-3/4 ml-2">
             <MapDisplay
               districts={districts}
               members={memberList}

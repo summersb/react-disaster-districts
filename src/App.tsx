@@ -13,7 +13,6 @@ import React, { useEffect } from 'react'
 import MemberList from './pages/members/MemberList'
 import Settings from './pages/settings/Settings'
 import UploadMembers from './pages/members/UploadMembers'
-import AddFakeMember from './pages/members/AddFakeMember'
 import AddDistrict from '@/pages/districts/AddDistrict'
 import EditDistrict from '@/pages/districts/EditDistrict'
 import ViewAllDistricts from '@/pages/districts/ViewAllDistricts'
@@ -45,8 +44,7 @@ function App() {
           <Route path="addmember" element={<AddMember />} />
           <Route path="editmember/:memberId" element={<EditMember />} />
           <Route path="upload" element={<UploadMembers />} />
-          <Route path="fakedata" element={<AddFakeMember />} />
-          <Route path="map" element={<div className="h-screen"><MapDisplay /></div>} />
+          <Route path="map" element={<div className="h-screen"><MapDisplay showLabel={false} /></div>} />
           <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Home />} />

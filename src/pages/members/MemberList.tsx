@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import CsvDownloader from 'react-csv-downloader'
 import { FilePenLine, Trash2 } from 'lucide-react'
 import {
@@ -20,11 +20,13 @@ import {
 } from '@/components/ui/dialog.tsx'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
+import type { District } from '@/type'
 
 const MemberList = () => {
   const [open, setOpen] = useState(false)
   const [id, setId] = useState<string>()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const { data } = useQuery({
     queryKey: ['members'],
     queryFn: getMemberList
@@ -47,6 +49,10 @@ const MemberList = () => {
 
         })
     }
+  }
+
+  const districtClicked = (district: District) => {
+    navigate(`/district/${district.id}`)
   }
 
   const columns = [
@@ -118,12 +124,13 @@ const MemberList = () => {
               }
               return 0
             }).map((m) => {
-              const district = districts?.find(d => d.members.includes(m.id))?.name
+              const district = districts?.find(d => d.members.includes(m.id))
+              const districtName = district?.name
               return (
                 <TableRow key={m.id}
                           className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                   <TableCell><Link to={`/editmember/${m.id}`}><FilePenLine /></Link></TableCell>
-                  <TableCell>{district}</TableCell>
+                  <TableCell onClick={() => districtClicked(district)}>{districtName}</TableCell>
                   <TableCell>{m.familyName}</TableCell>
                   <TableCell>{m.name}</TableCell>
                   <TableCell>{m.formattedAddress}</TableCell>

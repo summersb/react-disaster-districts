@@ -51,9 +51,6 @@ const Sidebar = () => {
       <div className="flex flex-row">
         <HardDriveUpload /> <Link to="/upload">Upload Members</Link>
       </div>
-      <div className="flex flex-row">
-        <HardDriveUpload /> <Link to="/fakedata">Fake Data</Link>
-      </div>
       <div className="flex flex-row grow">
         <Map />
         <Link to="/map">Map</Link>

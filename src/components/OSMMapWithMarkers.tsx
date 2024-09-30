@@ -4,6 +4,9 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import type { District, Member } from '@/type'
 import haversine from 'haversine'
+import { useQuery } from '@tanstack/react-query'
+import { getDistrictList } from '@/api'
+import { useNavigate } from 'react-router-dom'
 
 type Position = {
   lat: number
@@ -41,10 +44,15 @@ const declutter = (members: Member[]): Member[] => {
 }
 
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
+  const navigate = useNavigate()
   const markerClicked = (member: Member) => {
     if (props.markerClicked) {
       props.markerClicked(member)
     }
+  }
+
+  const districtClicked = (district: District) => {
+    navigate(`/district/${district.id}`)
   }
 
   const getMemberColor = (memberId: string): string => {
@@ -60,6 +68,20 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
     return new L.Icon({
       iconUrl: `/images/${color}.svg`,
       iconSize: [25, 41], // size of the icon
+      iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+      popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
+      shadowUrl:
+        'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      shadowSize: [41, 41]
+    })
+  }
+
+  function getGroupIcon(district: District): L.Icon {
+    const color = district.color
+
+    return new L.Icon({
+      iconUrl: `/images/Group.svg`,
+      iconSize: [50, 80], // size of the icon
       iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
       popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
       shadowUrl:
@@ -92,6 +114,19 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
           }
         </Marker>
       ))}
+      {props.districts?.map(d => {
+        // get average lat/lng for a district
+        const distMembers = d.members.map(id => props.members.find(m => m.id === id))
+        const lats = distMembers.map(m => m.lat ?? 0)
+        const lngs = distMembers.map(m => m.lng ?? 0)
+
+        const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
+        const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
+        return (<Marker key={d.id} position={[avgLat, avgLng]} icon={getGroupIcon(d)}
+                        eventHandlers={{ click: () => districtClicked(d) }}>
+          <Tooltip opacity={1} direction="right" offset={[0, 20]} permanent>{d.name}</Tooltip>
+        </Marker>)
+      })}
     </MapContainer>
   )
 }
