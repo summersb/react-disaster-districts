@@ -28,9 +28,12 @@ type MapWithMarkersProps = {
 }
 
 const declutter = (members: Member[]): Member[] => {
-  return members.map(m => {
+  return members?.map(m => {
+    if (m === undefined) {
+      console.log('declutter', m)
+    }
     const start = { latitude: m.lat, longitude: m.lng }
-    const toClose = members.filter(mm => mm.id !== m.id)
+    const toClose = members?.filter(mm => mm.id !== m.id)
       .find(otherM => {
         const end = { latitude: otherM.lat, longitude: otherM.lng }
         const distance = haversine(start, end)
@@ -58,7 +61,7 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
   const getMemberColor = (memberId: string): string => {
     // check if member is leader
     const leaderColor = props.districts?.find(d => d.leaderId === memberId)?.color
-    const color = props.districts?.find(d => d.members.includes(memberId))?.color
+    const color = props.districts?.find(d => d.members?.includes(memberId))?.color
     return leaderColor ?? color ?? 'Blue'
   }
 
@@ -102,7 +105,7 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ChangeView lat={props.center.lat} lng={props.center.lng} />
-      {declutter(props.members).map((member: Member) => (
+      {declutter(props.members)?.map((member: Member) => (
         <Marker
           key={member.id}
           position={[member.lat ?? 0, member.lng ?? 0]}
@@ -116,7 +119,7 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
       ))}
       {props.districts?.map(d => {
         // get average lat/lng for a district
-        const distMembers = d.members.map(id => props.members.find(m => m.id === id))
+        const distMembers = d.members?.map(id => props.members?.find(m => m.id === id)).filter(m => m != null)
         const lats = distMembers.map(m => m.lat ?? 0)
         const lngs = distMembers.map(m => m.lng ?? 0)
 

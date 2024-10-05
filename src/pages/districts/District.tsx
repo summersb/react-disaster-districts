@@ -43,7 +43,7 @@ export default function District(props: DistrictProps) {
   }
 
   const leader = data?.findLast(m => m.id == d.leaderId)
-  const leaderName = `${leader.familyName}, ${leader.name}`
+  const leaderName = `${leader?.familyName}, ${leader?.name}`
   const assistant = data?.findLast(m => m.id == d.assistantId)
   const assistantName = assistant ? `${assistant?.familyName}, ${assistant?.name}` : ''
   return (

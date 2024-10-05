@@ -67,6 +67,7 @@ const DistrictForm = () => {
       })
     } else {
       append(member)
+      // TODO remove member from other districts
     }
   }
 

@@ -34,7 +34,7 @@ const EditDistrict = (): React.ReactElement => {
         leader: members?.find((m) => m.id == db.leaderId),
         assistant: members?.find((m) => m.id == db.assistantId),
         color: db.color,
-        members: members?.filter((m) => db.members?.includes(m.id))
+        members: members?.filter((m) => db.members?.includes(m.id)).sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
       } as District
     })
 
