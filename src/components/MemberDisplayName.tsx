@@ -6,7 +6,7 @@ type MemberDisplayNameProps = {
 }
 
 const MemberDisplayName = (props: MemberDisplayNameProps): React.ReaactElement => {
-  const name = `${props?.member?.familyName}`
+  const name = `${props?.member?.familyName ?? ''}`
   const f = props?.member?.name ? `, ${props.member.name}` : ''
   return (
     <span>{name}{f}</span>

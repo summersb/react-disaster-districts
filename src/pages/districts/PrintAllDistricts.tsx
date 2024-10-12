@@ -35,7 +35,7 @@ const PrintAllDistricts = () => {
     <>
       {districts?.sort((d1, d2) => d1.name.localeCompare(d2.name))
         .map((district) => (
-          <div key={district.id} className="print-map break-before-always mb-4">
+          <div key={district.id} className="new-right-page mb-4">
             <h1>District Name: {district.name}</h1>
             <h2>Leader <MemberDisplayName member={members?.find(m => m.id === district.leaderId)} /></h2>
             <h2>Assistant Leader <MemberDisplayName member={members?.find(m => m.id === district.assistantId)} /></h2>

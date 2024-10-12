@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getDistrict, getMemberList } from '@/api'
-import OSMMapWithMarkers from '@/components/OSMMapWithMarkers2'
+import OSMMapWithMarkers from '@/components/OSMMapWithMarkersOneDistrict.tsx'
 import { useParams } from 'react-router-dom'
 import { District, DistrictDbType } from '@/type'
 import { useMap } from 'react-leaflet'
@@ -74,7 +74,7 @@ const ShowOneDistrictMap = (props: ShowOneDistrictMap) => {
   return (
     <div>
       {district &&
-        <div>
+        <div className="print-map">
           <div className="w-full">
             <h1>{district?.name}</h1>
             {district?.leader && <h2>Leader: <MemberDisplayName member={district.leader} /></h2>}

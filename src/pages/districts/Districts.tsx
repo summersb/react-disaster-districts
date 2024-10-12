@@ -51,12 +51,12 @@ const columns: (memberList: Member[]) => ColumnDef<DistrictDbType>[] = (memberLi
 export default function Districts() {
   const { data: districts } = useQuery({
     queryKey: ['districts'],
-    queryFn: getDistrictList
+    queryFn: () => getDistrictList().then(data => data.sort((s1, s2) => s1.name.localeCompare(s2.name)))
   })
 
   const { data: memberList } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: () => getMemberList().then(data => data.sort((s1, s2) => s1.familyName.localeCompare(s2.familyName)))
   })
 
   const table = useReactTable({

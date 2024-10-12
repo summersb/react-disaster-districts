@@ -145,9 +145,8 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
           eventHandlers={{ click: () => markerClicked(member) }}
           icon={getMemberIcon(member)}
         >
-          {props.showLabel && <Tooltip direction="right" offset={[0, 20]} opacity={.5}
-                                       permanent><MemberDisplayName member={member} /></Tooltip>
-          }
+          <Tooltip direction="right" offset={[0, 20]} opacity={props.showLabel ? .5 : 1}
+                   permanent={props.showLabel}><MemberDisplayName member={member} /></Tooltip>
         </Marker>
       ))}
       {props.districts?.map(d => {

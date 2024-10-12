@@ -36,11 +36,9 @@ const PrintDistrict = (props: DistrictProps) => {
                 <TableCell>{m.phone}</TableCell>
               </TableRow>
             ))}
-          <TableRow>
-            <TableCell colSpan={3}><ShowOneDistrictMap district={props.district} /></TableCell>
-          </TableRow>
         </TableBody>
       </Table>
+      <ShowOneDistrictMap district={props.district} />
     </div>
   )
 }
