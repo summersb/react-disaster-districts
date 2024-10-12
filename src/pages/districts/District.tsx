@@ -15,10 +15,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { FilePenLine, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 
 type DistrictProps = {
   district: DistrictDbType
 }
+
 export default function District(props: DistrictProps) {
   const { district: d } = props
   const [open, setOpen] = useState<boolean>(false)
@@ -43,9 +45,7 @@ export default function District(props: DistrictProps) {
   }
 
   const leader = data?.findLast(m => m.id == d.leaderId)
-  const leaderName = `${leader?.familyName}, ${leader?.name}`
   const assistant = data?.findLast(m => m.id == d.assistantId)
-  const assistantName = assistant ? `${assistant?.familyName}, ${assistant?.name}` : ''
   return (
     <TableRow>
       <TableCell>
@@ -56,8 +56,8 @@ export default function District(props: DistrictProps) {
         </Link>
       </TableCell>
       <TableCell>{d.name}</TableCell>
-      <TableCell>{leaderName}</TableCell>
-      <TableCell>{assistantName}</TableCell>
+      <TableCell><MemberDisplayName member={leader} /></TableCell>
+      <TableCell><MemberDisplayName member={assistant} /></TableCell>
       <TableCell>
         <Trash2 onClick={delDistrict} />
         <Dialog open={open} onOpenChange={setOpen}>

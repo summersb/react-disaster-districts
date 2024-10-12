@@ -3,40 +3,22 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useQuery } from '@tanstack/react-query'
 import type { District, DistrictDbType } from '@/type'
 import { getDistrict, getMemberList } from '@/api'
+import ShowOneDistrictMap from '@/pages/districts/ShowOneDistrictMap'
+import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 
 type DistrictProps = {
-  districtId: string
+  district: District
 }
 
-const ViewDistrict = (props: DistrictProps) => {
+const PrintDistrict = (props: DistrictProps) => {
 
   const { data: members } = useQuery({
     queryKey: ['members'],
     queryFn: getMemberList
   })
 
-  const convertDbDistrict = (): Promise<District> =>
-    getDistrict(props.districtId as string).then((db: DistrictDbType) => {
-      return {
-        id: db.id,
-        name: db.name,
-        leader: members?.find((m) => m.id == db.leaderId),
-        assistant: members?.find((m) => m.id == db.assistantId),
-        color: db.color,
-        members: members?.filter((m) => db.members?.includes(m.id))
-      } as District
-    })
-
-  const { data } = useQuery({
-    queryKey: ['district', props.districtId],
-    queryFn: convertDbDistrict,
-    enabled: props.districtId !== undefined && members !== undefined,
-    retry: false
-  })
-
   return (
     <div className="page">
-
       <Table className="print:visible">
         <TableHeader>
           <TableRow>
@@ -46,18 +28,21 @@ const ViewDistrict = (props: DistrictProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.members.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
+          {props.district.members?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
             .map(m => (
               <TableRow key={m.id}>
-                <TableCell>{m.familyName}, {m.name}</TableCell>
+                <TableCell><MemberDisplayName member={m} /></TableCell>
                 <TableCell>{m.address1} {m.address2}, {m.city}</TableCell>
-                <TableCell>{m.phone_number}</TableCell>
+                <TableCell>{m.phone}</TableCell>
               </TableRow>
             ))}
+          <TableRow>
+            <TableCell colSpan={3}><ShowOneDistrictMap district={props.district} /></TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </div>
   )
 }
 
-export default ViewDistrict
+export default PrintDistrict

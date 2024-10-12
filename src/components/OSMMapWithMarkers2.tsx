@@ -2,23 +2,10 @@ import React from 'react'
 import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import type { District, DistrictDbType, Member } from '@/type'
+import type { District, Member } from '@/type'
 import haversine from 'haversine'
 import { useNavigate } from 'react-router-dom'
-import { getDistrict } from '@/api'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
-
-const convertDbDistrict = (district: DistrictDbType, members: Member[]): Promise<District> =>
-  district.map(db => {
-    return {
-      id: db.id,
-      name: db.name,
-      leader: members?.find((m) => m.id == db.leaderId),
-      assistant: members?.find((m) => m.id == db.assistantId),
-      color: db.color,
-      members: members?.filter((m) => db.members?.includes(m.id))
-    } as District
-  })
 
 type Position = {
   lat: number
@@ -32,11 +19,9 @@ function ChangeView(center: Position) {
 }
 
 type MapWithMarkersProps = {
-  districts: District[]
+  district: District
   members: Member[]
-  center?: Position
-  markerClicked?: (member: Member) => void
-  showLabel: boolean
+  bounds?: React.ReactElement
 }
 
 const deClutter = (members: Member[]): Member[] => {
@@ -69,22 +54,13 @@ const deClutter = (members: Member[]): Member[] => {
 
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
   const navigate = useNavigate()
-  const markerClicked = (member: Member) => {
-    if (props.markerClicked) {
-      props.markerClicked(member)
-    }
-  }
 
-  console.log('osm', props)
-  const districtClicked = (district: District) => {
-    navigate(`/district/${district.id}`)
-  }
+  console.log('district', props.district)
 
   const getMemberColor = (memberId: string): string => {
     // check if member is leader
-    const leaderColor = props.districts?.find(d => d.leaderId === memberId)?.color
-    const color = props.districts?.find(d => d.members?.includes(memberId))?.color
-    return leaderColor ?? color ?? 'Blue'
+    const leaderColor = props.district.color
+    return leaderColor ?? 'Blue'
   }
 
   function getMemberIcon(member: Member): L.Icon {
@@ -116,21 +92,21 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
   }
 
   const findCenter = (memberList: Member[]) => {
-    const lats = memberList.map(m => m.lat ?? 0)
-    const lngs = memberList.map(m => m.lng ?? 0)
+    const lats = memberList.map(m => m?.lat ?? 0)
+    const lngs = memberList.map(m => m?.lng ?? 0)
 
     const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
     const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
     return { lat: avgLat, lng: avgLng }
   }
 
-  const center = props.center ? props.center : findCenter(props.members)
+  const center = findCenter(props.district.members ?? [])
 
   return (
     <MapContainer
       center={[center.lat, center.lng]}
       style={{ height: '100%', width: '100%' }}
-      zoom={14}
+      zoom={15}
       zoomControl={false}
     >
       <TileLayer
@@ -138,31 +114,39 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ChangeView lat={center.lat} lng={center.lng} />
-      {deClutter(props.members)?.map((member: Member) => (
+      {deClutter(props.district.members ?? [])?.map((member: Member) => (
         <Marker
           key={member.id}
           position={[member.lat ?? 0, member.lng ?? 0]}
-          eventHandlers={{ click: () => markerClicked(member) }}
           icon={getMemberIcon(member)}
         >
-          {props.showLabel && <Tooltip direction="right" offset={[0, 20]} opacity={.5}
-                                       permanent><MemberDisplayName member={member} /></Tooltip>
-          }
+          <Tooltip direction="right" offset={[0, 20]} opacity={.5}
+                   permanent><MemberDisplayName member={member} /></Tooltip>
         </Marker>
       ))}
-      {props.districts?.map(d => {
+      {(() => {
         // get average lat/lng for a district
-        const distMembers = d.members?.map(id => props.members?.find(m => m.id === id)).filter(m => m != null)
-        const lats = distMembers.map(m => m.lat ?? 0)
-        const lngs = distMembers.map(m => m.lng ?? 0)
+        const distMembers = props.district.members?.filter(m => m != null)
+        const validLatLngs = distMembers.filter(m => m.lat !== undefined && m.lng !== undefined)
 
-        const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
-        const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
-        return (<Marker key={d.id} position={[avgLat, avgLng]} icon={getGroupIcon(d)}
-                        eventHandlers={{ click: () => districtClicked(d) }}>
-          <Tooltip opacity={1} direction="right" offset={[0, 20]} permanent>{d.name}</Tooltip>
-        </Marker>)
-      })}
+        if (validLatLngs.length > 0) {
+          const lats = distMembers.map(m => m.lat)
+          const lngs = distMembers.map(m => m.lng)
+
+          const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
+          const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
+          return (
+            <Marker key={props.district.id} position={[avgLat, avgLng]} icon={getGroupIcon(props.district)}>
+              <Tooltip opacity={1}
+                       direction="right"
+                       offset={[0, 20]}
+                       permanent>{props.district.name}
+              </Tooltip>
+              {props.bounds && props.bounds}
+            </Marker>)
+        }
+        return null
+      })()}
     </MapContainer>
   )
 }

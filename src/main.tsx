@@ -13,8 +13,8 @@ const client = new QueryClient()
 const router = createBrowserRouter([
   {
     path: '/*',
-    element: <App />,
-  },
+    element: <App />
+  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -24,8 +24,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <RouterProvider router={router} />
         </AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        <div className="print:hidden">
+          <ReactQueryDevtools initialIsOpen={false} />
+        </div>
       </QueryClientProvider>
     </ThemeProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
+
 )

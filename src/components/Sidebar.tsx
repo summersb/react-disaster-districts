@@ -40,7 +40,7 @@ const Sidebar = () => {
       </div>
       <div className="flex flex-row">
         <Rows3 />
-        <Link to="/viewdistrict">Print Districts</Link>
+        <Link to="/printdistrict">Print Districts</Link>
       </div>
       <div className="flex flex-row">
         <Users /> <Link to="/members">Members</Link>

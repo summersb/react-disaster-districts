@@ -29,6 +29,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getDistrictList, getMemberList, saveMember } from '@/api'
 import type { Member } from '@/type'
 import { ColorPicker } from '@/components/ColorPicker.tsx'
+import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 
 const DistrictForm = () => {
   const [openLeader, setOpenLeader] = useState(false)
@@ -139,7 +140,7 @@ const DistrictForm = () => {
                   className="w-full justify-start"
                 >
                   {leader?.id ? (
-                    <>{`${leader.familyName}, ${leader.name}`}</>
+                    <MemberDisplayName member={leader} />
                   ) : (
                     <>Select district leader</>
                   )}
@@ -175,9 +176,7 @@ const DistrictForm = () => {
                                 : 'opacity-0'
                             )}
                           />
-                          <span>
-                        {member.familyName}, {member.name}
-                      </span>
+                          <MemberDisplayName member={member} />
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -202,7 +201,7 @@ const DistrictForm = () => {
                   className="w-full justify-start"
                 >
                   {assistant?.id ? (
-                    <>{`${assistant.familyName}, ${assistant.name}`}</>
+                    <MemberDisplayName member={assistant} />
                   ) : (
                     <>Select district assistant leader</>
                   )}
@@ -238,9 +237,7 @@ const DistrictForm = () => {
                                 : 'opacity-0'
                             )}
                           />
-                          <span>
-                        {member.familyName}, {member.name}
-                      </span>
+                          <MemberDisplayName member={member} />
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -269,7 +266,7 @@ const DistrictForm = () => {
                 {districtMembers?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
                   .map((field, idx: number) => (
                     <li className="odd:bg-slate-700 even:bg-slate-900 " key={idx}>
-                      {field.familyName}, {field.name}
+                      <MemberDisplayName member={field} />
                     </li>
                   ))}
               </ul>

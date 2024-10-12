@@ -15,7 +15,8 @@ import Settings from './pages/settings/Settings'
 import UploadMembers from './pages/members/UploadMembers'
 import AddDistrict from '@/pages/districts/AddDistrict'
 import EditDistrict from '@/pages/districts/EditDistrict'
-import ViewAllDistricts from '@/pages/districts/ViewAllDistricts'
+import PrintAllDistricts from '@/pages/districts/PrintAllDistricts.tsx'
+import ShowOneDistrictMap from '@/pages/districts/ShowOneDistrictMap.tsx'
 
 function App() {
   const { setUser } = useAuth()
@@ -39,7 +40,8 @@ function App() {
           <Route path="districts" element={<Districts />} />
           <Route path="adddistrict" element={<AddDistrict />} />
           <Route path="district/:districtId" element={<EditDistrict />} />
-          <Route path="viewdistrict" element={<ViewAllDistricts />} />
+          <Route path="viewdistrict/:districtId" element={<ShowOneDistrictMap />} />
+          <Route path="printdistrict" element={<PrintAllDistricts />} />
           <Route path="members" element={<MemberList />} />
           <Route path="addmember" element={<AddMember />} />
           <Route path="editmember/:memberId" element={<EditMember />} />

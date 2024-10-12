@@ -1,13 +1,13 @@
 import { z } from 'zod'
-import { MemberSchema } from './Member'
+import { Member, MemberSchema } from './Member'
 import { BaseObject } from './SharedTypes'
 
 export const DistrictSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1),
-  leader: MemberSchema,
-  assistant: MemberSchema.optional(),
-  members: z.array(MemberSchema).optional(),
+  leader: z.custom<Member>(),
+  assistant: z.custom<Member>().optional(),
+  members: z.array(z.custom<Member>()).optional(),
   color: z.string()
 })
 
