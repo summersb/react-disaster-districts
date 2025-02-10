@@ -105,6 +105,19 @@ const MemberForm = () => {
       />
       <FormField
         control={control}
+        name="postalCode"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Zip Code</FormLabel>
+            <FormControl>
+              <Input placeholder="92084" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
         name="lat"
         render={({ field }) => (
           <FormItem>

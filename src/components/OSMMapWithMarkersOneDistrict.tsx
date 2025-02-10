@@ -22,6 +22,7 @@ type MapWithMarkersProps = {
   district: District
   members: Member[]
   bounds?: React.ReactElement
+  showDistrictMarker?: boolean
 }
 
 const deClutter = (members: Member[]): Member[] => {
@@ -54,8 +55,6 @@ const deClutter = (members: Member[]): Member[] => {
 
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
   const navigate = useNavigate()
-
-  console.log('district', props.district)
 
   const getMemberColor = (memberId: string): string => {
     // check if member is leader
@@ -102,6 +101,20 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
 
   const center = findCenter(props.district.members ?? [])
 
+  // get average lat/lng for a district
+  const distMembers = props.district.members?.filter(m => m != null)
+  const validLatLngs = distMembers.filter(m => m.lat !== undefined && m.lng !== undefined)
+
+  let avgLat, avgLng
+  if (validLatLngs.length > 0) {
+    // get average lat/lng for a district
+    const lats = distMembers.map(m => m.lat)
+    const lngs = distMembers.map(m => m.lng)
+
+    avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
+    avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
+  }
+
   return (
     <MapContainer
       center={[center.lat, center.lng]}
@@ -124,29 +137,16 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
                    permanent><MemberDisplayName member={member} /></Tooltip>
         </Marker>
       ))}
-      {(() => {
-        // get average lat/lng for a district
-        const distMembers = props.district.members?.filter(m => m != null)
-        const validLatLngs = distMembers.filter(m => m.lat !== undefined && m.lng !== undefined)
-
-        if (validLatLngs.length > 0) {
-          const lats = distMembers.map(m => m.lat)
-          const lngs = distMembers.map(m => m.lng)
-
-          const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
-          const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
-          return (
-            <Marker key={props.district.id} position={[avgLat, avgLng]} icon={getGroupIcon(props.district)}>
-              <Tooltip opacity={1}
-                       direction="right"
-                       offset={[0, 20]}
-                       permanent>{props.district.name}
-              </Tooltip>
-              {props.bounds && props.bounds}
-            </Marker>)
-        }
-        return null
-      })()}
+      {props.showDistrictMarker && (
+        <Marker key={props.district.id} position={[avgLat, avgLng]} icon={getGroupIcon(props.district)}>
+          <Tooltip opacity={1}
+                   direction="right"
+                   offset={[0, 20]}
+                   permanent>{props.district.name}
+          </Tooltip>
+          {props.bounds && props.bounds}
+        </Marker>
+      )}
     </MapContainer>
   )
 }

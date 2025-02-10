@@ -10,10 +10,20 @@ export const MemberSchema = z.object({
   address2: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
-  postalCode: z.number().optional(),
+  postalCode: z.string().optional(),
   phone: z.string().optional(),
-  lat: z.preprocess((val) => val === '' ? undefined : Number(val), z.number().optional()).optional(),
-  lng: z.preprocess((val) => val === '' ? undefined : Number(val), z.number().optional()).optional()
+  lat: z
+    .preprocess(
+      (val) => (val === '' ? undefined : Number(val)),
+      z.number().optional(),
+    )
+    .optional(),
+  lng: z
+    .preprocess(
+      (val) => (val === '' ? undefined : Number(val)),
+      z.number().optional(),
+    )
+    .optional(),
 })
 
 export type Member = z.infer<typeof MemberSchema> & BaseObject

@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react'
 
 export type UserType = {
+  uid?: string
   name?: string | null
   photoURL?: string | null
 }
@@ -10,7 +11,7 @@ export interface UserContextType {
   setUser: (user: UserType) => void
 }
 
-const DEFAULT = {} as UserContextType;
+const DEFAULT = {} as UserContextType
 
 const AuthContext = createContext<UserContextType>(DEFAULT)
 

@@ -26,6 +26,7 @@ const MapWithBounds = ({ bounds }) => {
 
 type ShowOneDistrictMap = {
   district?: District
+  showDistrictMarker?: boolean
 }
 
 const ShowOneDistrictMap = (props: ShowOneDistrictMap) => {
@@ -81,7 +82,9 @@ const ShowOneDistrictMap = (props: ShowOneDistrictMap) => {
             {district?.assistant && <h2>Assistant: <MemberDisplayName member={district.assistant} /></h2>}
           </div>
           <div className="w-[700px] h-[500px]">
-            <OSMMapWithMarkers district={district} members={members || []} bounds={bounds(district)} />
+            <OSMMapWithMarkers showDistrictMarker={props.showDistrictMarker ?? true} district={district}
+                               members={members || []}
+                               bounds={bounds(district)} />
           </div>
         </div>
       }

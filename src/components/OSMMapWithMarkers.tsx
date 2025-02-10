@@ -75,7 +75,6 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
     }
   }
 
-  console.log('osm', props)
   const districtClicked = (district: District) => {
     navigate(`/district/${district.id}`)
   }

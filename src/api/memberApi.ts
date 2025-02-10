@@ -1,23 +1,25 @@
-import {collection, doc, getDoc, setDoc,} from 'firebase/firestore'
-import {db} from "./firebase"
-import type {Member} from '@/type'
-import {filterNullUndefined, toList, toMap} from './arrayUtils'
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
+import { db } from './firebase'
+import type { Member } from '@/type'
+import { filterNullUndefined, toList, toMap } from './arrayUtils'
+import { getActiveWard } from '@/utils/ward.ts'
 
-const wardDoc = `${import.meta.env.VITE_ward}`
 const topCollection = import.meta.env.VITE_top_collection
 const memberListDocName = 'member_list'
-
 
 export const saveMemberList = async (members: Member[]): Promise<void> => {
   const map = toMap(members)
   return saveMemberMap(map)
 }
 
-export const saveMemberMap = async (members: Map<string, Partial<Member>>): Promise<void> => {
+export const saveMemberMap = async (
+  members: Map<string, Partial<Member>>,
+): Promise<void> => {
+  const wardDoc = getActiveWard().wardId
   const cleanMemberMap = filterNullUndefined(members)
   const holderObject: {
     [key: string]: Partial<Member>
-  } = Object.fromEntries(Array.from(cleanMemberMap.entries()));
+  } = Object.fromEntries(Array.from(cleanMemberMap.entries()))
   const wardCollection = collection(db, `${topCollection}/${wardDoc}/members`)
   await setDoc(doc(wardCollection, memberListDocName), holderObject)
 }
@@ -28,7 +30,12 @@ export const getMemberList = async (): Promise<Member[]> => {
 }
 
 export const getMemberMap = async (): Promise<Map<string, Member>> => {
-  const docRef = doc(db, `${topCollection}/${wardDoc}/members`, memberListDocName)
+  const wardDoc = getActiveWard().wardId
+  const docRef = doc(
+    db,
+    `${topCollection}/${wardDoc}/members`,
+    memberListDocName,
+  )
   const memberListSnap = await getDoc(docRef)
   if (memberListSnap.exists()) {
     const map: { [key: string]: Member } = memberListSnap.data()

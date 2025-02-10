@@ -20,6 +20,7 @@ const PrintAllDistricts = () => {
     queryFn: getDistrictList
   })
 
+  console.log('d', districts)
   const convertDbDistrict = (db: DistrictDbType): District => {
     return {
       id: db.id,
@@ -40,7 +41,7 @@ const PrintAllDistricts = () => {
             <h2>Leader <MemberDisplayName member={members?.find(m => m.id === district.leaderId)} /></h2>
             <h2>Assistant Leader <MemberDisplayName member={members?.find(m => m.id === district.assistantId)} /></h2>
 
-            <PrintDistrict district={convertDbDistrict(district)} />
+            <PrintDistrict districtId={district.id} />
           </div>
         ))}
     </>

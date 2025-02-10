@@ -101,7 +101,7 @@ export function parseData(data: string): Partial<Member>[] {
 
 export const resolveAddress = async (address: string): Promise<Result> =>
   fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}`
+    `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}`,
   )
     .then((res) => {
       if (res.ok) {
@@ -137,56 +137,58 @@ type LocationProps = {
 const nominatimUrl = 'https://nominatim.openstreetmap.org/search'
 
 export const osmResolveAddress = async ({
-                                          street,
-                                          city,
-                                          state,
-                                          postalCode,
-                                          country
-                                        }: LocationProps): Promise<LocationResult> => {
+  street,
+  city,
+  state,
+  postalCode,
+}: LocationProps): Promise<LocationResult> => {
   const url = `${nominatimUrl}?street=${encodeURIComponent(street)}&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&postalcode=${encodeURIComponent(postalCode)}&format=json&limit=1`
 
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      'User-Agent': 'DisasterDistricts' // You should provide a custom User-Agent header
-    }
+      'User-Agent': 'DisasterDistricts', // You should provide a custom User-Agent header
+    },
   })
 
   if (response.ok) {
     const data: LocationResult[] = await response.json()
     console.log('result', data)
-    return data
-      .map((location: LocationResult) => {
-        return { lat: Number(location.lat), lon: Number(location.lon), displayName: location.displayName }
-      })[0]
+    return data.map((location: LocationResult) => {
+      return {
+        lat: Number(location.lat),
+        lon: Number(location.lon),
+        displayName: location.displayName,
+      }
+    })[0]
   } else {
     throw new Error('Failed to fetch location data.')
   }
 }
 
 export const getGeo = async (
-  member: Partial<Member>
+  member: Partial<Member>,
 ): Promise<Partial<Member>> => {
   if (member.lat === undefined || member.lng === undefined) {
-    const query = `${member.address1},${member.address2 == null ? '' : member.address2 + ','}${member.city},${member.state}`
     const address: LocationProps = {
       street: member.address1 ?? '',
       city: member.city ?? '',
       state: member.state ?? '',
-      postalCode: String(member.postalCode) ?? ''
+      postalCode: String(member.postalCode) ?? '',
     }
 
-    return osmResolveAddress(address).then(address => {
-      member.formattedAddress = address.displayName
-      member.lat = address.lat
-      member.lng = address.lon
-      return member
-    }
+    return osmResolveAddress(address).then(
+      (address) => {
+        member.formattedAddress = address?.displayName
+        member.lat = address?.lat
+        member.lng = address?.lon
+        return member
+      },
 
-//      member.postalCode = parseInt(
-//        address?.address_components?.find(
-//          (addressComponent) => addressComponent.types[0] === 'postal_code'
-//        )?.long_name ?? '0'
+      //      member.postalCode = parseInt(
+      //        address?.address_components?.find(
+      //          (addressComponent) => addressComponent.types[0] === 'postal_code'
+      //        )?.long_name ?? '0'
     )
   }
 }

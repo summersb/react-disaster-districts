@@ -6,15 +6,17 @@ import {
   School2,
   Settings,
   User,
-  Users
+  Users,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import useAuth from '@/hooks/useAuth'
+import { useLocalStorageState } from '@/hooks/useLocalStorageState.tsx'
+import { WardConfig } from '@/type/Ward.ts'
 
 const Sidebar = () => {
   const { user } = useAuth()
-
+  const [wardDoc] = useLocalStorageState<WardConfig>('ward', undefined)
   return (
     <div className="flex flex-col h-full space-y-4">
       <div className="flex flex-row">
@@ -30,6 +32,7 @@ const Sidebar = () => {
         <img alt="logo" src="/favicon.ico" width={24} height={24} /> Disaster
         Districts
       </div>
+      <div className="flex flex-row">{wardDoc?.wardName}</div>
       <div className="flex flex-row">
         <School />
         <Link to="/districts">Districts</Link>

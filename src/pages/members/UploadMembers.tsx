@@ -35,7 +35,6 @@ const UploadMembers = () => {
 
   const onSubmit = (data: FormType) => {
     const parsedPersons = parseData(data.data)
-    console.log('parsedPerson', parsedPersons)
     setMembers(parsedPersons as Member[])
     form.setValue('people', parsedPersons)
   }
