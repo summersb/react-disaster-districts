@@ -11,6 +11,15 @@ type WardDoc = {
   list: WardConfig[]
 }
 
+export const loadDefaultWard = async (uid: string): Promise<WardConfig> => {
+  const docRef = doc(db, `users`, uid)
+  const userConfig = await getDoc(docRef)
+  if (userConfig.exists()) {
+    return userConfig.data().wardConfig
+  }
+  return { wardId: '', wardName: '' }
+}
+
 export const getWardList = async (): Promise<WardConfig[]> => {
   const docRef = doc(db, `${topCollection}`, 'wardList')
   const wardList = await getDoc(docRef)

@@ -5,18 +5,20 @@ import L from 'leaflet'
 import type { District, DistrictDbType, Member } from '@/type'
 import haversine from 'haversine'
 import { useNavigate } from 'react-router-dom'
-import { getDistrict } from '@/api'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 
-const convertDbDistrict = (district: DistrictDbType, members: Member[]): Promise<District> =>
-  district.map(db => {
+const convertDbDistrict = (
+  district: DistrictDbType,
+  members: Member[],
+): Promise<District> =>
+  district.map((db) => {
     return {
       id: db.id,
       name: db.name,
       leader: members?.find((m) => m.id == db.leaderId),
       assistant: members?.find((m) => m.id == db.assistantId),
       color: db.color,
-      members: members?.filter((m) => db.members?.includes(m.id))
+      members: members?.filter((m) => db.members?.includes(m.id)),
     } as District
   })
 
@@ -43,28 +45,28 @@ const deClutter = (members: Member[]): Member[] => {
   if (!members) {
     return []
   }
+  const validLatLng = members.filter(
+    (m) => m?.lat !== undefined && m?.lng !== undefined,
+  )
 
-  const validLatLng = members.filter(m => m?.lat !== undefined && m?.lng !== undefined)
+  return validLatLng.map((m) => {
+    const start = { latitude: m.lat, longitude: m.lng }
 
-  return validLatLng
-    .map(m => {
-      const start = { latitude: m.lat, longitude: m.lng }
-
-      const toClose = validLatLng
-        .filter(mm => mm.id !== m.id)
-        .find(otherM => {
-          const end = { latitude: otherM.lat, longitude: otherM.lng }
-          const distance = haversine(start, end)
-          return distance < 0.01
-        })
-      if (toClose) {
-        return {
-          ...m,
-          lat: m.lat + .0005
-        }
+    const toClose = validLatLng
+      .filter((mm) => mm.id !== m.id)
+      .find((otherM) => {
+        const end = { latitude: otherM.lat, longitude: otherM.lng }
+        const distance = haversine(start, end)
+        return distance < 0.01
+      })
+    if (toClose) {
+      return {
+        ...m,
+        lat: m.lat + 0.0005,
       }
-      return m
-    })
+    }
+    return m
+  })
 }
 
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
@@ -81,8 +83,12 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
 
   const getMemberColor = (memberId: string): string => {
     // check if member is leader
-    const leaderColor = props.districts?.find(d => d.leaderId === memberId)?.color
-    const color = props.districts?.find(d => d.members?.includes(memberId))?.color
+    const leaderColor = props.districts?.find(
+      (d) => d.leaderId === memberId,
+    )?.color
+    const color = props.districts?.find((d) =>
+      d.members?.includes(memberId),
+    )?.color
     return leaderColor ?? color ?? 'Blue'
   }
 
@@ -96,7 +102,7 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
       popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
       shadowUrl:
         'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-      shadowSize: [41, 41]
+      shadowSize: [41, 41],
     })
   }
 
@@ -110,13 +116,13 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
       popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
       shadowUrl:
         'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-      shadowSize: [41, 41]
+      shadowSize: [41, 41],
     })
   }
 
   const findCenter = (memberList: Member[]) => {
-    const lats = memberList.map(m => m.lat ?? 0)
-    const lngs = memberList.map(m => m.lng ?? 0)
+    const lats = memberList.map((m) => m.lat ?? 0)
+    const lngs = memberList.map((m) => m.lng ?? 0)
 
     const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
     const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
@@ -144,22 +150,39 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
           eventHandlers={{ click: () => markerClicked(member) }}
           icon={getMemberIcon(member)}
         >
-          <Tooltip direction="right" offset={[0, 20]} opacity={props.showLabel ? .5 : 1}
-                   permanent={props.showLabel}><MemberDisplayName member={member} /></Tooltip>
+          <Tooltip
+            direction="right"
+            offset={[0, 20]}
+            opacity={props.showLabel ? 0.5 : 1}
+            permanent={props.showLabel}
+          >
+            <MemberDisplayName member={member} />
+          </Tooltip>
         </Marker>
       ))}
-      {props.districts?.map(d => {
+      {props.districts?.map((d) => {
         // get average lat/lng for a district
-        const distMembers = d.members?.map(id => props.members?.find(m => m.id === id)).filter(m => m != null)
-        const lats = distMembers.map(m => m.lat ?? 0)
-        const lngs = distMembers.map(m => m.lng ?? 0)
+        const distMembers = d.members
+          ?.map((mem) => props.members?.find((m) => m.id === mem.id))
+          .filter((m) => m != null)
+        if (distMembers == null || distMembers?.length == 0) return null
+        const lats = distMembers.map((m) => m.lat ?? 0)
+        const lngs = distMembers.map((m) => m.lng ?? 0)
 
         const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
         const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
-        return (<Marker key={d.id} position={[avgLat, avgLng]} icon={getGroupIcon(d)}
-                        eventHandlers={{ click: () => districtClicked(d) }}>
-          <Tooltip opacity={1} direction="right" offset={[0, 20]} permanent>{d.name}</Tooltip>
-        </Marker>)
+        return (
+          <Marker
+            key={d.id}
+            position={[avgLat, avgLng]}
+            icon={getGroupIcon(d)}
+            eventHandlers={{ click: () => districtClicked(d) }}
+          >
+            <Tooltip opacity={1} direction="right" offset={[0, 20]} permanent>
+              {d.name}
+            </Tooltip>
+          </Marker>
+        )
       })}
     </MapContainer>
   )

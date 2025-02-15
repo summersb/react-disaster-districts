@@ -6,7 +6,7 @@ import {
   createWard,
   getWardList,
   savePermissions,
-  saveWardList,
+  saveWardList
 } from '@/api/wardApi.ts'
 import { saveDistrictList } from '@/api/districtApi.ts'
 import { UserRequest, UserRoles } from '@/type/User.ts'
@@ -14,6 +14,9 @@ import { DistrictDbType, Member } from '@/type'
 import DownloadWard from '@/pages/home/DownloadWard.tsx'
 import CreateWard from '@/pages/home/CreateWard.tsx'
 import useAuth from '@/hooks/useAuth.tsx'
+import { useLocalStorageState } from '@/hooks/useLocalStorageState.tsx'
+import { WardConfig } from '@/type/Ward.ts'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 type WardDoc = {
   id: string
@@ -24,17 +27,24 @@ type WardDoc = {
 }
 
 const AdminDashboard = () => {
+  const queryClient = useQueryClient()
   const { user } = useAuth()
   const [requests, setRequests] = useState<UserRequest[]>([])
   const [file, setFile] = useState()
   const fileReader = new FileReader()
+  const [, setActiveWard] = useLocalStorageState<WardConfig>('ward', undefined)
+  const { data } = useQuery({ queryKey: ['wardList'], queryFn: getWardList })
+  const select = (ward: string, name: string) => {
+    setActiveWard({ wardId: ward, wardName: name })
+    queryClient.invalidateQueries()
+  }
 
   useEffect(() => {
     const fetchRequests = async () => {
       const querySnapshot = await getDocs(collection(db, 'accessRequests'))
       const data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data(),
+        ...doc.data()
       }))
       setRequests(data)
     }
@@ -45,14 +55,14 @@ const AdminDashboard = () => {
   const handleApprove = async (id: string) => {
     const requestRef = doc(db, 'accessRequests', id)
     await updateDoc(requestRef, {
-      status: 'approved',
+      status: 'approved'
     })
   }
 
   const handleReject = async (id: string) => {
     const requestRef = doc(db, 'accessRequests', id)
     await updateDoc(requestRef, {
-      status: 'rejected',
+      status: 'rejected'
     })
   }
 
@@ -61,19 +71,19 @@ const AdminDashboard = () => {
   }
 
   const handleOnSubmit = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault()
 
     if (file) {
-      fileReader.onload = async function (event) {
+      fileReader.onload = async function(event) {
         const text = event.target?.result
         if (text) {
           const wardData: WardDoc = JSON.parse(text as string)
           const wardList = await getWardList()
           saveWardList([
             ...(wardList || []),
-            { wardId: wardData.id, wardName: wardData.name },
+            { wardId: wardData.id, wardName: wardData.name }
           ])
           createWard(wardData.id, wardData.name, user)
           saveMemberList(wardData.members)
@@ -90,6 +100,17 @@ const AdminDashboard = () => {
     <div>
       <h2>Admin Dashboard</h2>
       <ul>
+        <li>
+          Choose Ward
+          {data?.map((wc) => (
+            <Button
+              key={wc.wardId}
+              onClick={() => select(wc.wardId, wc.wardName)}
+            >
+              {wc.wardName}
+            </Button>
+          ))}
+        </li>
         {requests.map((request) => (
           <li key={request.id}>
             {request.email} - {request.status}

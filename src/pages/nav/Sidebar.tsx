@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   HardDriveUpload,
   Map,
@@ -9,14 +10,26 @@ import {
   Users,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import useAuth from '@/hooks/useAuth'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx'
+import useAuth from '@/hooks/useAuth.tsx'
 import { useLocalStorageState } from '@/hooks/useLocalStorageState.tsx'
 import { WardConfig } from '@/type/Ward.ts'
+import { Button } from '@/components/ui/button'
+import { auth, signOut } from '@/api/firebase.ts'
 
-const Sidebar = () => {
+const Sidebar = (): React.ReactElement => {
   const { user } = useAuth()
   const [wardDoc] = useLocalStorageState<WardConfig>('ward', undefined)
+
+  const logout = async () => {
+    try {
+      await signOut(auth)
+      console.log('User logged out successfully')
+    } catch (error) {
+      console.log('Unable to sign out')
+    }
+  }
+
   return (
     <div className="flex flex-col h-full space-y-4">
       <div className="flex flex-row">
@@ -57,6 +70,9 @@ const Sidebar = () => {
       <div className="flex flex-row grow">
         <Map />
         <Link to="/map">Map</Link>
+      </div>
+      <div className="flex flex-row grow">
+        <Button onClick={logout}>Logout</Button>
       </div>
       <div className="flex flex-row">
         <Settings />

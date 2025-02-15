@@ -19,19 +19,25 @@ import PrintAllDistricts from '@/pages/districts/PrintAllDistricts.tsx'
 import ShowOneDistrictMap from '@/pages/districts/ShowOneDistrictMap.tsx'
 import AdminDashboard from '@/pages/admin/AdminDashboard.tsx'
 import PrintDistrict from '@/pages/districts/PrintDistrict.tsx'
-import SelectWard from '@/pages/home/SelectWard.tsx'
+import WardAdmin from '@/pages/home/WardAdmin.tsx'
+import { loadDefaultWard } from '@/api/wardApi.ts'
+import { useLocalStorageState } from '@/hooks/useLocalStorageState.tsx'
+import { WardConfig } from '@/type/Ward.ts'
 
 function App(): React.ReactElement {
+  const [, setActiveWard] = useLocalStorageState<WardConfig>('ward', undefined)
   const { setUser } = useAuth()
 
   useEffect(() => {
-    return auth.onAuthStateChanged((user) => {
+    return auth.onAuthStateChanged(async (user) => {
       if (user != null) {
         setUser({
           uid: user.uid,
           name: user.displayName,
           photoURL: user.photoURL,
         })
+        const wardConfig = await loadDefaultWard(user.uid)
+        setActiveWard(wardConfig)
       } else {
         setUser({})
       }
@@ -67,7 +73,7 @@ function App(): React.ReactElement {
             }
           />
           <Route path="settings" element={<Settings />} />
-          <Route path="/" element={<SelectWard />} />
+          <Route path="/" element={<WardAdmin />} />
         </Route>
         <Route path="*" element={<Home />} />
       </Route>

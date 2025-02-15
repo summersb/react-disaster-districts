@@ -1,7 +1,7 @@
 import useAuth from '@/hooks/useAuth'
 import { Outlet } from 'react-router-dom'
 import Login from '../home/Login'
-import Sidebar from '@/components/Sidebar'
+import Sidebar from '@/pages/nav/Sidebar.tsx'
 
 const Layout = () => {
   const { user } = useAuth()
