@@ -12,14 +12,14 @@ const DEFAULT: Partial<District> = {
   name: '',
   leader: undefined,
   assistant: undefined,
-  color: '#FF5733',
-  members: []
+  color: 'Red',
+  members: [],
 }
 
 const AddDistrict = (): React.ReactElement => {
   const form = useForm<District>({
     resolver: zodResolver(DistrictSchema),
-    defaultValues: DEFAULT
+    defaultValues: DEFAULT,
   })
 
   const onSubmit = (data: District): Promise<void> => {
@@ -29,7 +29,7 @@ const AddDistrict = (): React.ReactElement => {
       leaderId: data.leader?.id,
       assistantId: data.assistant?.id,
       color: data.color,
-      members: data.members?.map(m => m.id)
+      members: data.members?.map((m) => m.id),
     }
     return saveDistrict(dbDistrict)
       .then(() => {
@@ -38,7 +38,7 @@ const AddDistrict = (): React.ReactElement => {
       .catch((err) => {
         form.setError('name', {
           type: 'custom',
-          message: err.message
+          message: err.message,
         })
       })
   }
@@ -47,6 +47,7 @@ const AddDistrict = (): React.ReactElement => {
     console.log('errors', form.formState.errors)
   }
 
+  const districtId = form.getValues().id
   return (
     <div className="h-full flex flex-col items-center justify-center">
       <div className="w-full rounded p-6 shadow-md">
@@ -54,7 +55,7 @@ const AddDistrict = (): React.ReactElement => {
 
         <Form {...form}>
           <form action="#" onSubmit={form.handleSubmit(onSubmit)} method="POST">
-            <DistrictForm />
+            <DistrictForm districtId={districtId} />
 
             <div className="text-gray-700 mb-4">
               <button

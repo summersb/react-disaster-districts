@@ -4,7 +4,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,25 +13,29 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-  CommandList
+  CommandList,
 } from '@/components/ui/command'
 import { CommandInput } from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from '@/components/ui/popover'
 import { useFormContext, useFieldArray } from 'react-hook-form'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import MapDisplay from '@/pages/map/MapDisplay'
 import { useQuery } from '@tanstack/react-query'
-import { getDistrictList, getMemberList, saveMember } from '@/api'
+import { getDistrictList, getMemberList } from '@/api'
 import type { Member } from '@/type'
 import { ColorPicker } from '@/components/ColorPicker.tsx'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 
-const DistrictForm = () => {
+type DistrictFormProps = {
+  districtId: string
+}
+
+const DistrictForm = ({ districtId }: DistrictFormProps) => {
   const [openLeader, setOpenLeader] = useState(false)
   const [openAssistant, setOpenAssistant] = useState(false)
   const form = useFormContext()
@@ -39,22 +43,34 @@ const DistrictForm = () => {
     fields: districtMembers,
     append,
     remove,
-    update
-  } = useFieldArray({
+    update,
+  } = useFieldArray<Member>({
     control: form.control,
     name: 'members',
-    keyName: '_id'
+    keyName: '_id',
   })
 
+  console.log('districtMembers', districtMembers)
   const { data } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
 
   const { data: districts } = useQuery({
     queryKey: ['districts'],
-    queryFn: getDistrictList
+    queryFn: getDistrictList,
   })
+  // update current district with current member list
+  const currentDistrict = districts?.find((d) => d.id === districtId)
+  if (currentDistrict) {
+    currentDistrict.members = districtMembers.map((m) => m.id)
+    if (currentDistrict.leaderId) {
+      currentDistrict.members.push(currentDistrict.leaderId)
+    }
+    if (currentDistrict.assistantId) {
+      currentDistrict.members.push(currentDistrict.assistantId)
+    }
+  }
 
   const leader = form.getValues('leader')
   const assistant = form.getValues('assistant')
@@ -73,9 +89,9 @@ const DistrictForm = () => {
   }
 
   const memberList: Member[] = data ?? []
-
   const leaderList = memberList?.filter((m) => m.id !== assistant?.id ?? '')
   const assistantList = memberList?.filter((m) => m.id !== leader?.id ?? '')
+
   return (
     <>
       <div className="flex mb-4 ">
@@ -161,7 +177,7 @@ const DistrictForm = () => {
                             member.familyName,
                             member.name,
                             member.address1 ?? '',
-                            member?.formattedAddress ?? ''
+                            member?.formattedAddress ?? '',
                           ]}
                           onSelect={() => {
                             form.setValue('leader', member)
@@ -173,7 +189,7 @@ const DistrictForm = () => {
                               'mr-2 h-4 w-4',
                               leader?.id === member.id
                                 ? 'opacity-100'
-                                : 'opacity-0'
+                                : 'opacity-0',
                             )}
                           />
                           <MemberDisplayName member={member} />
@@ -222,7 +238,7 @@ const DistrictForm = () => {
                             member.familyName,
                             member.name,
                             member.address1 ?? '',
-                            member.formattedAddress ?? ''
+                            member.formattedAddress ?? '',
                           ]}
                           onSelect={() => {
                             form.setValue('assistant', member)
@@ -234,7 +250,7 @@ const DistrictForm = () => {
                               'mr-2 h-4 w-4',
                               assistant?.id === member.id
                                 ? 'opacity-100'
-                                : 'opacity-0'
+                                : 'opacity-0',
                             )}
                           />
                           <MemberDisplayName member={member} />
@@ -263,9 +279,13 @@ const DistrictForm = () => {
           <div className="flex mb-4 h-[500px]">
             <div className="w-1/2 mr-2">
               <ul>
-                {districtMembers?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
+                {districtMembers
+                  ?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
                   .map((field, idx: number) => (
-                    <li className="odd:bg-slate-700 even:bg-slate-900 " key={idx}>
+                    <li
+                      className="odd:bg-slate-700 even:bg-slate-900 "
+                      key={idx}
+                    >
                       <MemberDisplayName member={field} />
                     </li>
                   ))}

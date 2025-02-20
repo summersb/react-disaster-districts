@@ -1,10 +1,10 @@
 import { Form } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SubmitHandler, useForm, UseFormReset } from 'react-hook-form'
-import type { District, DistrictDbType, Member } from '@/type'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import type { District, DistrictDbType } from '@/type'
 import { DistrictSchema } from '@/type'
 import React, { useEffect } from 'react'
-import { saveDistrict, getDistrict, getMember, getMemberList } from '@/api'
+import { saveDistrict, getDistrict, getMemberList } from '@/api'
 import DistrictForm from './DistrictForm'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
@@ -17,13 +17,13 @@ const EditDistrict = (): React.ReactElement => {
     defaultValues: {
       id: 'pending',
       name: '',
-      members: []
-    }
+      members: [],
+    },
   })
 
   const { data: members } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
 
   const convertDbDistrict = (): Promise<District> =>
@@ -34,7 +34,9 @@ const EditDistrict = (): React.ReactElement => {
         leader: members?.find((m) => m.id == db.leaderId),
         assistant: members?.find((m) => m.id == db.assistantId),
         color: db.color,
-        members: members?.filter((m) => db.members?.includes(m.id)).sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
+        members: members
+          ?.filter((m) => db.members?.includes(m.id))
+          .sort((m1, m2) => m1.familyName.localeCompare(m2.familyName)),
       } as District
     })
 
@@ -42,7 +44,7 @@ const EditDistrict = (): React.ReactElement => {
     queryKey: ['district', districtId],
     queryFn: convertDbDistrict,
     enabled: districtId !== undefined && members !== undefined,
-    retry: false
+    retry: false,
   })
 
   useEffect(() => {
@@ -57,7 +59,7 @@ const EditDistrict = (): React.ReactElement => {
       name: data.name,
       leaderId: data.leader.id,
       color: data.color,
-      members: data.members?.map((m) => m.id) ?? []
+      members: data.members?.map((m) => m.id) ?? [],
     }
     dbDistrict.assistantId = data?.assistant?.id ?? undefined
     saveDistrict(dbDistrict)
@@ -67,7 +69,7 @@ const EditDistrict = (): React.ReactElement => {
       .catch((err: Error) => {
         form.setError('name', {
           type: 'custom',
-          message: err.message
+          message: err.message,
         })
       })
   }
@@ -83,7 +85,7 @@ const EditDistrict = (): React.ReactElement => {
 
         <Form {...form}>
           <form action="#" onSubmit={form.handleSubmit(onSubmit)} method="POST">
-            <DistrictForm />
+            <DistrictForm districtId={districtId as string} />
 
             <div className="text-gray-700 mb-4">
               <button
