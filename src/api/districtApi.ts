@@ -17,7 +17,7 @@ export const saveDistrictList = async (
 export const saveDistrictMap = async (
   district: Map<string, DistrictDbType>,
 ): Promise<void> => {
-  const wardDoc = getActiveWard().wardId
+  const wardDoc = getActiveWard().wardName
   const cleanDistrictMap = filterNullUndefined(district)
   const holderObject: {
     [key: string]: Partial<Member>
@@ -34,7 +34,7 @@ export const getDistrictList = async (): Promise<DistrictDbType[]> => {
 export const getDistrictMap = async (): Promise<
   Map<string, DistrictDbType>
 > => {
-  const wardDoc = getActiveWard().wardId
+  const wardDoc = getActiveWard().wardName
   try {
     const docRef = doc(
       db,

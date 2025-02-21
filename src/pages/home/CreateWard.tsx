@@ -23,12 +23,11 @@ const CreateWard = () => {
   const queryClient = useQueryClient()
   const form = useForm<WardConfig>({
     defaultValues: {
-      wardId: '',
       wardName: '',
     },
   })
   const onSubmit = async (wardConfig: WardConfig) => {
-    await createWard(wardConfig.wardId, wardConfig.wardName, user)
+    await createWard(wardConfig.wardName, user)
     await saveWardList([...(data || []), wardConfig])
     queryClient.invalidateQueries({ queryKey: ['wardList'] })
     setActiveWard(wardConfig)
@@ -41,27 +40,6 @@ const CreateWard = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-2/3 space-y-6"
         >
-          <div className="mb-4">
-            <FormField
-              control={form.control}
-              name="wardId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ward Id</FormLabel>
-                  <FormControl>
-                    <div className="mb-4 text-black bg-slate-500">
-                      <Input
-                        placeholder="Ward name"
-                        {...field}
-                        className="text-white bg-gray-900"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
           <div className="mb-4">
             <FormField
               control={form.control}

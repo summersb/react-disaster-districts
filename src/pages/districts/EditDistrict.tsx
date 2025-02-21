@@ -3,13 +3,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import type { District, DistrictDbType } from '@/type'
 import { DistrictSchema } from '@/type'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { saveDistrict, getDistrict, getMemberList } from '@/api'
 import DistrictForm from './DistrictForm'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
+import SaveButton from '@/components/styled/SaveButton.tsx'
 
 const EditDistrict = (): React.ReactElement => {
+  const [saving, setSaving] = useState<boolean>(false)
   const { districtId } = useParams()
 
   const form = useForm<District>({
@@ -54,10 +56,11 @@ const EditDistrict = (): React.ReactElement => {
   }, [data, form])
 
   const onSubmit: SubmitHandler<District> = async (data) => {
+    setSaving(true)
     const dbDistrict: DistrictDbType = {
       id: data.id,
       name: data.name,
-      leaderId: data.leader.id,
+      leaderId: data.leader?.id,
       color: data.color,
       members: data.members?.map((m) => m.id) ?? [],
     }
@@ -71,6 +74,9 @@ const EditDistrict = (): React.ReactElement => {
           type: 'custom',
           message: err.message,
         })
+      })
+      .finally(() => {
+        setSaving(false)
       })
   }
 
@@ -88,12 +94,7 @@ const EditDistrict = (): React.ReactElement => {
             <DistrictForm districtId={districtId as string} />
 
             <div className="text-gray-700 mb-4">
-              <button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                Save
-              </button>
+              <SaveButton saving={saving} name="Save" disableName="Saving" />
             </div>
           </form>
         </Form>

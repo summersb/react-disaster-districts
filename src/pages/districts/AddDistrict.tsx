@@ -1,73 +1,106 @@
-import { Form } from '@/components/ui/form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
-import type { District, DistrictDbType } from '@/type'
-import { DistrictSchema } from '@/type'
-import React from 'react'
+import type { DistrictDbType } from '@/type'
+import React, { useState } from 'react'
 import { saveDistrict } from '@/api'
-import DistrictForm from './DistrictForm'
+import { useNavigate } from 'react-router-dom'
+import { Input } from '@/components/ui/input.tsx'
+import { ColorPicker } from '@/components/ColorPicker.tsx'
+import SaveButton from '@/components/styled/SaveButton.tsx'
 
-const DEFAULT: Partial<District> = {
-  id: crypto.randomUUID(),
-  name: '',
-  leader: undefined,
-  assistant: undefined,
-  color: 'Red',
-  members: [],
+type CreateDistrict = {
+  name: string
+  color: string
 }
 
 const AddDistrict = (): React.ReactElement => {
-  const form = useForm<District>({
-    resolver: zodResolver(DistrictSchema),
-    defaultValues: DEFAULT,
+  const [disabled, setDisabled] = useState<boolean>(false)
+  const navigate = useNavigate()
+  const form = useForm<CreateDistrict>({
+    defaultValues: { name: '', color: 'Red' },
   })
 
-  const onSubmit = (data: District): Promise<void> => {
-    const dbDistrict: DistrictDbType = {
-      id: data.id,
-      name: data.name,
-      leaderId: data.leader?.id,
-      assistantId: data.assistant?.id,
-      color: data.color,
-      members: data.members?.map((m) => m.id),
+  const onSubmit = ({ name, color }: CreateDistrict) => {
+    console.log('saving', name)
+    setDisabled(true)
+    // create new district
+    // forward to edit district
+    const data: DistrictDbType = {
+      id: crypto.randomUUID(),
+      name: name,
+      leader: undefined,
+      assistant: undefined,
+      color: color,
+      members: [],
     }
-    return saveDistrict(dbDistrict)
-      .then(() => {
-        form.reset(DEFAULT)
-      })
-      .catch((err) => {
-        form.setError('name', {
-          type: 'custom',
-          message: err.message,
-        })
-      })
+    saveDistrict(data).then(() => {
+      navigate(`/district/${data.id}`)
+    })
   }
 
-  if (Object.keys(form.formState.errors).length > 0) {
-    console.log('errors', form.formState.errors)
-  }
-
-  const districtId = form.getValues().id
   return (
-    <div className="h-full flex flex-col items-center justify-center">
-      <div className="w-full rounded p-6 shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Create District</h2>
-
-        <Form {...form}>
-          <form action="#" onSubmit={form.handleSubmit(onSubmit)} method="POST">
-            <DistrictForm districtId={districtId} />
-
-            <div className="text-gray-700 mb-4">
-              <button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                Submit
-              </button>
-            </div>
-          </form>
-        </Form>
-      </div>
+    <div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="mb-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <div className="mb-4 text-black bg-slate-500">
+                      <Input
+                        placeholder="District name"
+                        {...field}
+                        className="text-white bg-gray-900"
+                      />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="mb-4">
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <div className="mb-4 text-black bg-slate-500">
+                      <ColorPicker
+                        selectedColor={field.value}
+                        setSelectedColor={(color) => {
+                          form.setValue('color', color)
+                        }}
+                        className="text-white bg-gray-900"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="text-gray-700 mb-4">
+            <SaveButton
+              saving={disabled}
+              name="Create"
+              disableName="Creating"
+            />
+          </div>
+        </form>
+      </Form>
     </div>
   )
 }

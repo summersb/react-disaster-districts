@@ -1,5 +1,5 @@
 import { db } from './firebase'
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
 import { WardConfig } from '@/type/Ward.ts'
 import { UserRoles } from '@/type/User.ts'
 import { getActiveWard } from '@/utils/ward.ts'
@@ -17,7 +17,7 @@ export const loadDefaultWard = async (uid: string): Promise<WardConfig> => {
   if (userConfig.exists()) {
     return userConfig.data().wardConfig
   }
-  return { wardId: '', wardName: '' }
+  return { wardName: '' }
 }
 
 export const getWardList = async (): Promise<WardConfig[]> => {
@@ -31,32 +31,27 @@ export const getWardList = async (): Promise<WardConfig[]> => {
 }
 
 export const saveWardList = async (wardList: WardConfig[]): Promise<void> => {
+  console.log('Saving ward list', wardList)
   const docRef = doc(db, `${topCollection}`, 'wardList')
   const wardDoc = { list: wardList } as WardDoc
   await setDoc(docRef, wardDoc)
 }
 
 export const getPerms = async (): Promise<UserRoles> => {
-  const wardId = getActiveWard().wardId
-  const unit1Ref = doc(db, `${topCollection}`, wardId)
+  const wardName = getActiveWard().wardName
+  const unit1Ref = doc(db, `${topCollection}`, wardName)
   const permDoc = await getDoc(unit1Ref)
   return permDoc.data() as UserRoles
 }
 
 export const savePermissions = async (data: UserRoles): Promise<void> => {
-  const wardId = getActiveWard().wardId
-  const wardDoc = doc(db, `${topCollection}`, wardId)
+  const wardName = getActiveWard().wardName
+  const wardDoc = doc(db, `${topCollection}`, wardName)
   setDoc(wardDoc, data)
 }
 
-export const createWard = async (
-  id: string,
-  name: string,
-  user: UserType,
-): Promise<void> => {
-  //doc(db, `${topCollection}/districts`)
+export const createWard = async (id: string, user: UserType): Promise<void> => {
   await setDoc(doc(db, `${topCollection}`, id), {
-    name: name,
     createdBy: user.name,
     users: {
       [user.uid as string]: {

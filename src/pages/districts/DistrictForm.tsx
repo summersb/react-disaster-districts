@@ -50,7 +50,6 @@ const DistrictForm = ({ districtId }: DistrictFormProps) => {
     keyName: '_id',
   })
 
-  console.log('districtMembers', districtMembers)
   const { data } = useQuery({
     queryKey: ['members'],
     queryFn: getMemberList,
@@ -60,20 +59,23 @@ const DistrictForm = ({ districtId }: DistrictFormProps) => {
     queryKey: ['districts'],
     queryFn: getDistrictList,
   })
+  const color = form.watch('color')
+  const leader = form.watch('leader')
+  const assistant = form.watch('assistant')
   // update current district with current member list
   const currentDistrict = districts?.find((d) => d.id === districtId)
   if (currentDistrict) {
     currentDistrict.members = districtMembers.map((m) => m.id)
-    if (currentDistrict.leaderId) {
-      currentDistrict.members.push(currentDistrict.leaderId)
+    if (leader) {
+      currentDistrict.members.push(leader.id)
     }
-    if (currentDistrict.assistantId) {
-      currentDistrict.members.push(currentDistrict.assistantId)
+    if (assistant) {
+      currentDistrict.members.push(assistant.id)
+    }
+    if (currentDistrict.color) {
+      currentDistrict.color = color
     }
   }
-
-  const leader = form.getValues('leader')
-  const assistant = form.getValues('assistant')
 
   const memberClicked = (member: Member) => {
     if (districtMembers.find((m) => m.id === member.id)) {
@@ -280,7 +282,9 @@ const DistrictForm = ({ districtId }: DistrictFormProps) => {
             <div className="w-1/2 mr-2">
               <ul>
                 {districtMembers
-                  ?.sort((m1, m2) => m1.familyName.localeCompare(m2.familyName))
+                  ?.sort((m1, m2) =>
+                    m1?.familyName?.localeCompare(m2?.familyName),
+                  )
                   .map((field, idx: number) => (
                     <li
                       className="odd:bg-slate-700 even:bg-slate-900 "
