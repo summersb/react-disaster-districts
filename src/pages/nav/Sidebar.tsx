@@ -56,7 +56,7 @@ const Sidebar = (): React.ReactElement => {
       </div>
       <div className="flex flex-row">
         <Rows3 />
-        <Link to="/printdistrict">Print Districts</Link>
+        <Link to="/printdistricts">Print Districts</Link>
       </div>
       <div className="flex flex-row">
         <Users /> <Link to="/members">Members</Link>

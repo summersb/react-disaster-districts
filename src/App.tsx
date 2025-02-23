@@ -59,7 +59,7 @@ function App(): React.ReactElement {
             path="viewdistrict/:districtId"
             element={<ShowOneDistrictMap />}
           />
-          <Route path="printdistrict" element={<PrintAllDistricts />} />
+          <Route path="printdistricts" element={<PrintAllDistricts />} />
           <Route path="members" element={<MemberList />} />
           <Route path="addmember" element={<AddMember />} />
           <Route path="editmember/:memberId" element={<EditMember />} />

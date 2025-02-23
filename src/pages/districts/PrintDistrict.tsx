@@ -13,24 +13,27 @@ import { getDistrict, getMemberList } from '@/api'
 import ShowOneDistrictMap from '@/pages/districts/ShowOneDistrictMap'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 import { DistrictDbType } from '@/type'
+import { useParams } from 'react-router-dom'
 
 type DistrictProps = {
-  districtId: string
+  districtId?: string
 }
 
 const PrintDistrict = (props: DistrictProps): React.ReactElement => {
+  const { districtId } = useParams()
   const { data: members } = useQuery({
     queryKey: ['members'],
     queryFn: getMemberList,
   })
 
+  const id = props.districtId != null ? props.districtId : (districtId ?? '')
   const { data } = useQuery({
-    queryKey: ['district', props.districtId],
-    queryFn: () => getDistrict(props.districtId),
-    enabled: props.districtId !== undefined && members !== undefined,
+    queryKey: ['district', id],
+    queryFn: () => getDistrict(id),
+    enabled: id != null && members !== undefined,
   })
 
-  const convertDbDistrict = (db: DistrictDbType): District | undefined => {
+  const convertDbDistrict = (db?: DistrictDbType): District | undefined => {
     if (!db) {
       return undefined
     }

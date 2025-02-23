@@ -15,20 +15,20 @@ type MapDisplayProps = {
 }
 
 const MapDisplay = ({
-                      members,
-                      lat = 33.1928423,
-                      lng = -117.2413057,
-                      markerClicked,
-                      showLabel
-                    }: MapDisplayProps): React.ReactElement => {
+  members,
+  lat = 33.1928423,
+  lng = -117.2413057,
+  markerClicked,
+  showLabel,
+}: MapDisplayProps): React.ReactElement => {
   const { data, isError, error } = useQuery({
     queryKey: ['members'],
     queryFn: getMemberList,
-    retry: false
+    retry: false,
   })
   const { data: districts } = useQuery({
     queryKey: ['districts'],
-    queryFn: getDistrictList
+    queryFn: getDistrictList,
   })
 
   if (isError) {
@@ -38,13 +38,25 @@ const MapDisplay = ({
   const m = (members ?? data)?.filter((m) => m.lat !== undefined)
   const center = {
     lat: lat ?? 33.19228423,
-    lng: lng ?? -17.2413057
+    lng: lng ?? -17.2413057,
   }
   return (
-    <div className="h-full">
-      {m && <OSMMapWithMarkers districts={districts} members={m} center={center} markerClicked={markerClicked}
-                               showLabel={showLabel} />}
-    </div>
+    <>
+      {!districts && <div>Loading</div>}
+      {districts && (
+        <div className="h-full">
+          {m && (
+            <OSMMapWithMarkers
+              districts={districts}
+              members={m}
+              center={center}
+              markerClicked={markerClicked}
+              showLabel={showLabel}
+            />
+          )}
+        </div>
+      )}
+    </>
   )
 }
 

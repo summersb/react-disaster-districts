@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Member, MemberSchema } from './Member'
+import { Member } from './Member'
 import { BaseObject } from './SharedTypes'
 
 export const DistrictSchema = z.object({
@@ -8,7 +8,7 @@ export const DistrictSchema = z.object({
   leader: z.custom<Member>(),
   assistant: z.custom<Member>().optional(),
   members: z.array(z.custom<Member>()).optional(),
-  color: z.string()
+  color: z.string(),
 })
 
 export const DistrictDB = z.object({
@@ -17,7 +17,7 @@ export const DistrictDB = z.object({
   leaderId: z.string(),
   assistantId: z.string().optional(),
   members: z.array(z.string()).optional(),
-  color: z.string()
+  color: z.string(),
 })
 
 export type DistrictDbType = z.infer<typeof DistrictDB> & BaseObject

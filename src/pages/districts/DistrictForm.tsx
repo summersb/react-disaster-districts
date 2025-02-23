@@ -43,7 +43,6 @@ const DistrictForm = ({ districtId }: DistrictFormProps) => {
     fields: districtMembers,
     append,
     remove,
-    update,
   } = useFieldArray<Member>({
     control: form.control,
     name: 'members',

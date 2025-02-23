@@ -30,10 +30,8 @@ const columns: (memberList: Member[]) => ColumnDef<DistrictDbType>[] = (
     header: 'View',
     cell: (info) => (
       <Link to={`/printdistrict/${info.row.original.id}`}>
-        {' '}
         <Button size="icon">
-          {' '}
-          <View />{' '}
+          <View />
         </Button>
       </Link>
     ),
@@ -43,10 +41,8 @@ const columns: (memberList: Member[]) => ColumnDef<DistrictDbType>[] = (
     header: 'Edit',
     cell: (info) => (
       <Link to={`/district/${info.row.original.id}`}>
-        {' '}
         <Button size="icon">
-          {' '}
-          <FilePenLine />{' '}
+          <FilePenLine />
         </Button>{' '}
       </Link>
     ),

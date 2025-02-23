@@ -6,8 +6,9 @@ import { useParams } from 'react-router-dom'
 import { District, DistrictDbType } from '@/type'
 import { useMap } from 'react-leaflet'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
+import { LatLngBoundsExpression } from 'leaflet'
 
-const MapWithBounds = ({ bounds }) => {
+const MapWithBounds = ({ bounds }: { bounds: LatLngBoundsExpression }) => {
   const map = useMap()
 
   useEffect(() => {
@@ -33,27 +34,31 @@ const ShowOneDistrictMap = (props: ShowOneDistrictMap) => {
   const { districtId } = useParams()
   const { data: members } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
 
   const { data } = useQuery({
     queryKey: ['district', districtId],
     queryFn: () => getDistrict(districtId as string),
     enabled: districtId !== undefined && members !== undefined,
-    retry: false
+    retry: false,
   })
 
-  const convertDbDistrict = (db: DistrictDbType): District | undefined => {
+  const convertDbDistrict = (db?: DistrictDbType): District | undefined => {
     if (!db) {
       return undefined
     }
     return {
       id: db.id,
       name: db.name,
-      leader: members?.find((m) => m.id == db.leaderId),
+      leader: members?.find((m) => m.id == db.leaderId) ?? {
+        id: '0',
+        familyName: 'No leader assigned',
+        name: 'No leader',
+      },
       assistant: members?.find((m) => m.id == db.assistantId),
       color: db.color,
-      members: members?.filter((m) => db.members?.includes(m.id))
+      members: members?.filter((m) => db.members?.includes(m.id)),
     }
   }
 
@@ -61,33 +66,51 @@ const ShowOneDistrictMap = (props: ShowOneDistrictMap) => {
 
   const bounds = (d: District) => {
     const distMembers = d.members
-    const lats = distMembers.map(m => m.lat ?? 0)
-    const lngs = distMembers.map(m => m.lng ?? 0)
+    const latitudes = distMembers?.map((m) => m.lat ?? 0) ?? []
+    const longitudes = distMembers?.map((m) => m.lng ?? 0) ?? []
 
-    const minLat = Math.min(...lats)
-    const maxLat = Math.max(...lats)
-    const minLng = Math.min(...lngs)
-    const maxLng = Math.max(...lngs)
+    const minLat = Math.min(...latitudes)
+    const maxLat = Math.max(...latitudes)
+    const minLng = Math.min(...longitudes)
+    const maxLng = Math.max(...longitudes)
 
-    return <MapWithBounds bounds={[[minLat, minLng], [maxLat, maxLng]]} />
+    return (
+      <MapWithBounds
+        bounds={[
+          [minLat, minLng],
+          [maxLat, maxLng],
+        ]}
+      />
+    )
   }
 
   return (
     <div>
-      {district &&
+      {district && (district.members?.length ?? 0) > 0 && (
         <div className="print-map">
           <div className="w-full">
             <h1>{district?.name}</h1>
-            {district?.leader && <h2>Leader: <MemberDisplayName member={district.leader} /></h2>}
-            {district?.assistant && <h2>Assistant: <MemberDisplayName member={district.assistant} /></h2>}
+            {district?.leader && (
+              <h2>
+                Leader: <MemberDisplayName member={district.leader} />
+              </h2>
+            )}
+            {district?.assistant && (
+              <h2>
+                Assistant: <MemberDisplayName member={district.assistant} />
+              </h2>
+            )}
           </div>
           <div className="w-[700px] h-[500px]">
-            <OSMMapWithMarkers showDistrictMarker={props.showDistrictMarker ?? true} district={district}
-                               members={members || []}
-                               bounds={bounds(district)} />
+            <OSMMapWithMarkers
+              showDistrictMarker={props.showDistrictMarker ?? true}
+              district={district}
+              members={members || []}
+              bounds={bounds(district)}
+            />
           </div>
         </div>
-      }
+      )}
     </div>
   )
 }
