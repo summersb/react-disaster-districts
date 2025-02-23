@@ -11,7 +11,7 @@ import { WardConfig } from '@/type/Ward.ts'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import UploadWard from '@/pages/admin/UploadWard.tsx'
 
-const AdminDashboard = () => {
+const AdminDashboard = (): React.ReactElement => {
   const queryClient = useQueryClient()
   const [requests, setRequests] = useState<UserRequest[]>([])
   const [, setActiveWard] = useLocalStorageState<WardConfig>('ward', undefined)
@@ -27,7 +27,7 @@ const AdminDashboard = () => {
       const data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }))
+      })) as UserRequest[]
       setRequests(data)
     }
 

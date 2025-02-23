@@ -1,16 +1,14 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
 import {
-  Auth,
   connectAuthEmulator,
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-  signOut
+  signOut,
 } from 'firebase/auth'
 //import { getAnalytics } from 'firebase/analytics'
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
-import { sign } from 'node:crypto'
 //import { ReCaptchaV3Provider, initializeAppCheck } from 'firebase/app-check'
 
 const firebaseConfig = {
@@ -19,7 +17,7 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_projectId,
   storageBucket: import.meta.env.VITE_storageBucket,
   messagingSenderId: import.meta.env.VITE_messagingSenderId,
-  appId: import.meta.env.VITE_appId
+  appId: import.meta.env.VITE_appId,
   //  measurementId: import.meta.env.VITE_measurementId,
 }
 

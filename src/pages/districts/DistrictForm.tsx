@@ -27,7 +27,7 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import MapDisplay from '@/pages/map/MapDisplay'
 import { useQuery } from '@tanstack/react-query'
 import { getDistrictList, getMemberList } from '@/api'
-import type { Member } from '@/type'
+import type { District, Member } from '@/type'
 import { ColorPicker } from '@/components/ColorPicker.tsx'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 
@@ -43,9 +43,11 @@ const DistrictForm = ({ districtId }: DistrictFormProps) => {
     fields: districtMembers,
     append,
     remove,
-  } = useFieldArray<Member>({
+  } = useFieldArray<District, 'members', 'id'>({
+    // @ts-ignore
     control: form.control,
     name: 'members',
+    // @ts-ignore
     keyName: '_id',
   })
 
@@ -90,8 +92,8 @@ const DistrictForm = ({ districtId }: DistrictFormProps) => {
   }
 
   const memberList: Member[] = data ?? []
-  const leaderList = memberList?.filter((m) => m.id !== assistant?.id ?? '')
-  const assistantList = memberList?.filter((m) => m.id !== leader?.id ?? '')
+  const leaderList = memberList?.filter((m) => m.id !== assistant?.id)
+  const assistantList = memberList?.filter((m) => m.id !== leader?.id)
 
   return (
     <>
@@ -289,7 +291,7 @@ const DistrictForm = ({ districtId }: DistrictFormProps) => {
                       className="odd:bg-slate-700 even:bg-slate-900 "
                       key={idx}
                     >
-                      <MemberDisplayName member={field} />
+                      <MemberDisplayName member={field as Member} />
                     </li>
                   ))}
               </ul>

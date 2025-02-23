@@ -3,9 +3,8 @@ import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import type { District, Member } from '@/type'
-import haversine from 'haversine'
-import { useNavigate } from 'react-router-dom'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
+import { deClutter } from '@/components/mapUtils.ts'
 
 type Position = {
   lat: number
@@ -25,46 +24,9 @@ type MapWithMarkersProps = {
   showDistrictMarker?: boolean
 }
 
-const deClutter = (members: Member[]): Member[] => {
-  if (!members) {
-    return []
-  }
-
-  const validLatLng = members.filter(
-    (m) => m?.lat !== undefined && m?.lng !== undefined,
-  )
-
-  return validLatLng.map((m) => {
-    const start = { latitude: m.lat, longitude: m.lng }
-
-    const toClose = validLatLng
-      .filter((mm) => mm.id !== m.id)
-      .find((otherM) => {
-        const end = { latitude: otherM.lat, longitude: otherM.lng }
-        const distance = haversine(start, end)
-        return distance < 0.01
-      })
-    if (toClose) {
-      return {
-        ...m,
-        lat: m.lat + 0.0005,
-      }
-    }
-    return m
-  })
-}
-
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
-  const navigate = useNavigate()
-
-  const getMemberColor = (memberId: string): string => {
-    // check if member is leader
-    const leaderColor = props.district.color
-    return leaderColor ?? 'Blue'
-  }
-
-  function getMemberIcon(member: Member): L.Icon {
-    const color = getMemberColor(member.id)
+  function getMemberIcon(): L.Icon {
+    const color = props.district.color
 
     return new L.Icon({
       iconUrl: `/images/${color}.svg`,
@@ -116,7 +78,7 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
         <Marker
           key={member.id}
           position={[member.lat ?? 0, member.lng ?? 0]}
-          icon={getMemberIcon(member)}
+          icon={getMemberIcon()}
         >
           <Tooltip direction="right" offset={[0, 20]} opacity={0.5} permanent>
             <MemberDisplayName member={member} />

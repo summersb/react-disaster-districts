@@ -62,7 +62,7 @@ const MemberList = () => {
     }
   }
 
-  const districtClicked = (district: DistrictDbType) => {
+  const districtClicked = (district?: DistrictDbType) => {
     if (district) {
       navigate(`/district/${district.id}`)
     }

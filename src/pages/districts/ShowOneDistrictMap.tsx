@@ -18,6 +18,7 @@ const MapWithBounds = ({ bounds }: { bounds: LatLngBoundsExpression }) => {
     }
     map.off('resize')
     return () => {
+      // @ts-expect-error
       map.on('resize', map._onResize)
     }
   }, [map, bounds])
@@ -30,7 +31,7 @@ type ShowOneDistrictMap = {
   showDistrictMarker?: boolean
 }
 
-const ShowOneDistrictMap = (props: ShowOneDistrictMap) => {
+const ShowOneDistrictMap = (props: ShowOneDistrictMap): React.ReactElement => {
   const { districtId } = useParams()
   const { data: members } = useQuery({
     queryKey: ['members'],

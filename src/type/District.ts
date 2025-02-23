@@ -14,7 +14,7 @@ export const DistrictSchema = z.object({
 export const DistrictDB = z.object({
   id: z.string(),
   name: z.string(),
-  leaderId: z.string(),
+  leaderId: z.string().optional(),
   assistantId: z.string().optional(),
   members: z.array(z.string()).optional(),
   color: z.string(),

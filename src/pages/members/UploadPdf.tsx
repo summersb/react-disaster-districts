@@ -20,13 +20,11 @@ type UploadPdfProps = {
 const UploadPdf = ({ setMembers }: UploadPdfProps): React.ReactElement => {
   const [pdfFile, setPdfFile] = useState<File | null>()
 
-  const handleOnChangePdf = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPdfFile(e.target.files?.[0])
   }
 
-  const handleOnSubmitPdf = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => {
+  const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
 
     const fileReader = new FileReader()
@@ -34,7 +32,7 @@ const UploadPdf = ({ setMembers }: UploadPdfProps): React.ReactElement => {
       return
     }
 
-    fileReader.onload = async function (event) {
+    fileReader.onload = async function () {
       const pdfData = new Uint8Array(fileReader.result as ArrayBuffer)
       const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise
 
@@ -129,7 +127,7 @@ const UploadPdf = ({ setMembers }: UploadPdfProps): React.ReactElement => {
         id: crypto.randomUUID(),
         familyName: temp.name ?? '',
         ...temp,
-      }
+      } as Member
 
       members.push(member as Member)
     }
@@ -163,10 +161,10 @@ const UploadPdf = ({ setMembers }: UploadPdfProps): React.ReactElement => {
               type="file"
               id="pdfFileInput"
               accept=".pdf"
-              onChange={handleOnChangePdf}
+              onChange={onChange}
               className="mb-4 p-2 border rounded-md bg-gray-700 text-white"
             />
-            <StyledButton onClick={handleOnSubmitPdf}>IMPORT PDF</StyledButton>
+            <StyledButton onClick={onSubmit}>IMPORT PDF</StyledButton>
           </form>
         </Paper>
         <div className="w-1/2 p-4">

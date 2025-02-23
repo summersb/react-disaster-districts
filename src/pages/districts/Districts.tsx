@@ -55,8 +55,8 @@ const columns: (memberList: Member[]) => ColumnDef<DistrictDbType>[] = (
     accessorKey: 'leader',
     header: 'Leader',
     cell: (info) => {
-      const leader = memberList?.findLast(
-        (m) => m.id == info.row.original.leaderId,
+      const leader = memberList?.find(
+        (m: Member) => m.id == info.row.original.leaderId,
       )
       return <MemberDisplayName member={leader} />
     },
@@ -65,8 +65,8 @@ const columns: (memberList: Member[]) => ColumnDef<DistrictDbType>[] = (
     accessorKey: 'assistant',
     header: 'Assistant',
     cell: (info) => {
-      const assistant = memberList?.findLast(
-        (m) => m.id == info.row.original.assistantId,
+      const assistant = memberList?.find(
+        (m: Member) => m.id == info.row.original.assistantId,
       )
       return <MemberDisplayName member={assistant} />
     },

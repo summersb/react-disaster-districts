@@ -8,9 +8,10 @@ type UploadCsvProps = {
 }
 
 const UploadCsv = ({ setMembers }: UploadCsvProps): React.ReactElement => {
-  const [file, setFile] = useState()
-  const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setFile(e.target.files[0])
+  const [file, setFile] = useState<File | null>()
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(e.target.files?.[0])
   }
 
   const csvFileToArray = (str: string) => {
@@ -38,9 +39,7 @@ const UploadCsv = ({ setMembers }: UploadCsvProps): React.ReactElement => {
     setMembers(array)
   }
 
-  const handleOnSubmit = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => {
+  const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
 
     const fileReader = new FileReader()
@@ -65,10 +64,10 @@ const UploadCsv = ({ setMembers }: UploadCsvProps): React.ReactElement => {
             type="file"
             id="csvFileInput"
             accept=".csv"
-            onChange={handleOnChange}
+            onChange={onChange}
             className="mb-4 p-2 border rounded-md bg-gray-700 text-white"
           />
-          <StyledButton onClick={handleOnSubmit}>IMPORT CSV</StyledButton>
+          <StyledButton onClick={onSubmit}>IMPORT CSV</StyledButton>
         </form>
       </Paper>
     </>

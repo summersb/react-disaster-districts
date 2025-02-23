@@ -2,10 +2,10 @@ import React from 'react'
 import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import type { District, DistrictDbType, Member } from '@/type'
-import haversine from 'haversine'
+import type { DistrictDbType, Member } from '@/type'
 import { useNavigate } from 'react-router-dom'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
+import { deClutter } from '@/components/mapUtils.ts'
 
 type Position = {
   lat: number
@@ -26,34 +26,6 @@ type MapWithMarkersProps = {
   showLabel: boolean
 }
 
-const deClutter = (members: Member[]): Member[] => {
-  if (!members) {
-    return []
-  }
-  const validLatLng = members.filter(
-    (m) => m?.lat !== undefined && m?.lng !== undefined,
-  )
-
-  return validLatLng.map((m) => {
-    const start = { latitude: m.lat, longitude: m.lng }
-
-    const toClose = validLatLng
-      .filter((mm) => mm.id !== m.id)
-      .find((otherM) => {
-        const end = { latitude: otherM.lat, longitude: otherM.lng }
-        const distance = haversine(start, end)
-        return distance < 0.01
-      })
-    if (toClose) {
-      return {
-        ...m,
-        lat: (m?.lat ?? 0) + 0.0005,
-      }
-    }
-    return m
-  })
-}
-
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
   const navigate = useNavigate()
   const markerClicked = (member: Member) => {
@@ -62,8 +34,10 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
     }
   }
 
-  const districtClicked = (district: District) => {
-    navigate(`/district/${district.id}`)
+  const districtClicked = (district?: DistrictDbType) => {
+    if (district) {
+      navigate(`/district/${district.id}`)
+    }
   }
 
   const getMemberColor = (memberId: string): string => {

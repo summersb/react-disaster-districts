@@ -21,12 +21,12 @@ type WardDoc = {
 }
 
 const UploadWard = (): React.ReactElement => {
-  const [file, setFile] = useState()
+  const [file, setFile] = useState<File | null>()
   const { user } = useAuth()
   const fileReader = new FileReader()
 
-  const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setFile(e.target.files[0])
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(e.target.files?.[0])
   }
 
   const handleOnSubmit = async (

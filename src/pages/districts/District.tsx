@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from '@/components/ui/dialog.tsx'
 import { deleteDistrict, getMemberList } from '@/api'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -28,7 +28,7 @@ export default function District(props: DistrictProps) {
 
   const { data } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
 
   const delDistrict = () => {
@@ -44,8 +44,8 @@ export default function District(props: DistrictProps) {
     setOpen(false)
   }
 
-  const leader = data?.findLast(m => m.id == d.leaderId)
-  const assistant = data?.findLast(m => m.id == d.assistantId)
+  const leader = data?.find((m) => m.id == d.leaderId)
+  const assistant = data?.find((m) => m.id == d.assistantId)
   return (
     <TableRow>
       <TableCell>
@@ -56,8 +56,12 @@ export default function District(props: DistrictProps) {
         </Link>
       </TableCell>
       <TableCell>{d.name}</TableCell>
-      <TableCell><MemberDisplayName member={leader} /></TableCell>
-      <TableCell><MemberDisplayName member={assistant} /></TableCell>
+      <TableCell>
+        <MemberDisplayName member={leader} />
+      </TableCell>
+      <TableCell>
+        <MemberDisplayName member={assistant} />
+      </TableCell>
       <TableCell>
         <Trash2 onClick={delDistrict} />
         <Dialog open={open} onOpenChange={setOpen}>

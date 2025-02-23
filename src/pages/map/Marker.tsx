@@ -34,7 +34,6 @@ const Marker: React.FC<MarkerProps> = (
         key={props.member.id}
         onClick={() => {
           onSelect(props.member)
-          props.member.color = '#222222'
         }}
       >
         <Pin

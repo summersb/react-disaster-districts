@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form'
 import { useLocalStorageState } from '@/hooks/useLocalStorageState.tsx'
 import useAuth from '@/hooks/useAuth.tsx'
 
-const CreateWard = () => {
+const CreateWard = (): React.ReactElement => {
   const { user } = useAuth()
   const [, setActiveWard] = useLocalStorageState<WardConfig>('ward', undefined)
   const { data } = useQuery({ queryKey: ['wardList'], queryFn: getWardList })

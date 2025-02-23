@@ -35,8 +35,8 @@ const AddDistrict = (): React.ReactElement => {
     const data: DistrictDbType = {
       id: crypto.randomUUID(),
       name: name,
-      leader: undefined,
-      assistant: undefined,
+      leaderId: undefined,
+      assistantId: undefined,
       color: color,
       members: [],
     }

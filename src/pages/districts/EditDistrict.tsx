@@ -45,7 +45,7 @@ const EditDistrict = (): React.ReactElement => {
   const { data } = useQuery({
     queryKey: ['district', districtId],
     queryFn: convertDbDistrict,
-    enabled: districtId !== undefined && members !== undefined,
+    enabled: districtId != null && members !== undefined,
     retry: false,
   })
 
@@ -61,6 +61,7 @@ const EditDistrict = (): React.ReactElement => {
       id: data.id,
       name: data.name,
       leaderId: data.leader?.id,
+      assistantId: data.assistant?.id,
       color: data.color,
       members: data.members?.map((m) => m.id) ?? [],
     }
@@ -89,15 +90,21 @@ const EditDistrict = (): React.ReactElement => {
       <div className="w-full rounded p-6 shadow-md">
         <h2 className="text-xl font-semibold mb-4">Edit District</h2>
 
-        <Form {...form}>
-          <form action="#" onSubmit={form.handleSubmit(onSubmit)} method="POST">
-            <DistrictForm districtId={districtId as string} />
+        {data && (
+          <Form {...form}>
+            <form
+              action="#"
+              onSubmit={form.handleSubmit(onSubmit)}
+              method="POST"
+            >
+              <DistrictForm districtId={districtId as string} />
 
-            <div className="text-gray-700 mb-4">
-              <SaveButton saving={saving} name="Save" disableName="Saving" />
-            </div>
-          </form>
-        </Form>
+              <div className="text-gray-700 mb-4">
+                <SaveButton saving={saving} name="Save" disableName="Saving" />
+              </div>
+            </form>
+          </Form>
+        )}
       </div>
     </div>
   )

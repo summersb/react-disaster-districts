@@ -1,4 +1,4 @@
-import type { Member, Result } from '@/type'
+import type { Member } from '@/type'
 
 enum Mode {
   name,

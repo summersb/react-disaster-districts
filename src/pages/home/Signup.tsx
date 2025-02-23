@@ -1,18 +1,19 @@
-// src/pages/Signup.tsx
 import { useState } from 'react'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { collection, addDoc } from 'firebase/firestore'
 import { auth, db } from '@/api'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import StyledButton from '@/components/styled/StyledButton'
+import { useForm } from 'react-hook-form'
 
-const Signup = () => {
+const Signup = (): React.ReactElement => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSignup = async (data) => {
+  const form = useForm<{ email: string; password: string }>()
+  const onSubmit = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -31,32 +32,31 @@ const Signup = () => {
 
       // Success
       alert('Request submitted!')
-    } catch (error) {
-      setError(error.message)
+    } catch (error: unknown) {
+      setError(`${error}`)
     }
   }
 
   return (
     <div>
       <h2>Sign Up</h2>
-      <Form>
-        <Input type="email" label="Email" />
-        <Input type="password" label="Password" />
-        <Button>Sign Up</Button>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+          />
+          <Input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+          <StyledButton type="submit">Submit Access Request</StyledButton>
+        </form>
       </Form>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      <button onClick={handleSignup}>Submit Access Request</button>
       {error && <p>{error}</p>}
     </div>
   )
