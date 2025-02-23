@@ -10,7 +10,7 @@ export const MemberSchema = z.object({
   address2: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
-  postalCode: z.string().optional(),
+  postalCode: z.preprocess((val) => String(val), z.string().optional()),
   phone: z.string().optional(),
   lat: z
     .preprocess(

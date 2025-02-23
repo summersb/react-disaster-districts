@@ -1,6 +1,4 @@
 import type { Member, Result } from '@/type'
-import HistoryRouter from 'react-router-dom'
-import displayName = HistoryRouter.displayName
 
 enum Mode {
   name,
@@ -11,7 +9,7 @@ enum Mode {
   unk,
 }
 
-export function parseData(data: string): Partial<Member>[] {
+export function parseData(data: string): Member[] {
   const persons: Partial<Member>[] = []
 
   // Split the data into individual sections based on double newline characters
@@ -77,10 +75,7 @@ export function parseData(data: string): Partial<Member>[] {
       mode = Mode.city
       member.city = cityMatch[1]
       member.state = cityMatch[2]
-      member.postalCode = Number(cityMatch[3])
-      //        if (cityMatch[4]) {
-      //          member.zip2 = Number(cityMatch[4])
-      //        }
+      member.postalCode = cityMatch[3]
       return
     }
     if (latLngMatch) {
@@ -96,30 +91,8 @@ export function parseData(data: string): Partial<Member>[] {
     console.log('last person', member)
     persons.push(member)
   }
-  return persons
+  return persons as Member[]
 }
-
-export const resolveAddress = async (address: string): Promise<Result> =>
-  fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${import.meta.env.VITE_GOOGLE_MAP_API_KEY}`,
-  )
-    .then((res) => {
-      if (res.ok) {
-        return res.json()
-      } else {
-        throw new Error('Error resolving ' + res.statusText)
-      }
-    })
-    .then((json) => {
-      if (json.status === 'OK') {
-        return json.results[0]
-      } else {
-        throw new Error('Could not resolve address' + address)
-      }
-    })
-    .catch((e) => {
-      alert(e.message)
-    })
 
 export type LocationResult = {
   lat: number
@@ -153,7 +126,6 @@ export const osmResolveAddress = async ({
 
   if (response.ok) {
     const data: LocationResult[] = await response.json()
-    console.log('result', data)
     return data.map((location: LocationResult) => {
       return {
         lat: Number(location.lat),
@@ -191,4 +163,5 @@ export const getGeo = async (
       //        )?.long_name ?? '0'
     )
   }
+  return member
 }

@@ -7,13 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type {Changed} from '@/type'
+import type { Changed } from '@/type'
 
 type MembersProps = {
   members: Changed[]
 }
 
-const MembersUpdate = ({members}: MembersProps): React.ReactElement => {
+const MembersUpdate = ({ members }: MembersProps): React.ReactElement => {
   return (
     <>
       <Table>
@@ -31,8 +31,10 @@ const MembersUpdate = ({members}: MembersProps): React.ReactElement => {
         <TableBody>
           {members.map((m) => {
             return (
-              <TableRow key={m.old.id}
-                        className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+              <TableRow
+                key={`update-${m.old.id}`}
+                className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+              >
                 <TableCell>
                   {m.old.familyName}|{m.updated.familyName}
                 </TableCell>
@@ -40,7 +42,8 @@ const MembersUpdate = ({members}: MembersProps): React.ReactElement => {
                   {m.old.name}|{m.updated.name}
                 </TableCell>
                 <TableCell>
-                  {m.old.address1}|{m.updated.address1},{m.old.address2}|{m.updated.address2}
+                  {m.old.address1}|{m.updated.address1},{m.old.address2}|
+                  {m.updated.address2}
                 </TableCell>
                 <TableCell>
                   {m.old.city}|{m.updated.city}

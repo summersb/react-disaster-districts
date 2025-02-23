@@ -18,26 +18,30 @@ const EditMember = () => {
     queryKey: ['member', memberId],
     queryFn: () => getMember(memberId as string),
     enabled: memberId !== undefined,
-    retry: false
+    retry: false,
   })
 
   const form = useForm({
     resolver: zodResolver(MemberSchema),
-    values: data || {}
+    values: data || {},
   })
 
   const [error, setError] = useState<string>()
 
-  const onSubmit: SubmitHandler<Partial<Member>> = async (data: Partial<Member>) => {
+  const onSubmit: SubmitHandler<Partial<Member>> = async (
+    data: Partial<Member>,
+  ) => {
     const m = await getGeo(data)
-    saveMember(m as Member).then(() => {
-      navigate('/members')
-    }).catch((e: Error) => {
-      saveMember(data).then(() => {
+    saveMember(m as Member)
+      .then(() => {
         navigate('/members')
       })
-      setError(e.message)
-    })
+      .catch((e: Error) => {
+        saveMember(data).then(() => {
+          navigate('/members')
+        })
+        setError(e.message)
+      })
   }
 
   return (
@@ -58,18 +62,16 @@ const EditMember = () => {
             Save Member
           </Button>
           <Link to="/members">
-            <Button
-              variant="outline"
-              disabled={form.formState.isSubmitting}
-            >
+            <Button variant="outline" disabled={form.formState.isSubmitting}>
               Cancel
             </Button>
           </Link>
         </form>
       </Form>
-      <Link to="/members"><Button>Back</Button></Link>
+      <Link to="/members">
+        <Button>Back</Button>
+      </Link>
     </>
-
   )
 }
 

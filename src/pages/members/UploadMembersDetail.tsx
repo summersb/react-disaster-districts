@@ -23,17 +23,28 @@ const UploadMembersDetail = ({ members }: MembersProps): React.ReactElement => {
             <TableHead>Surname</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Address</TableHead>
-            <TableHead>Phone</TableHead>
+            <TableHead>City</TableHead>
+            <TableHead>State</TableHead>
+            <TableHead>Lat</TableHead>
+            <TableHead>Long</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {members.map((m) => {
             return (
-              <TableRow key={m.id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+              <TableRow
+                key={m.id}
+                className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+              >
                 <TableCell>{m.familyName}</TableCell>
                 <TableCell>{m.name}</TableCell>
-                <TableCell>{m.formattedAddress}</TableCell>
-                <TableCell>{m.phone}</TableCell>
+                <TableCell>
+                  {m.address1} {m.address2}
+                </TableCell>
+                <TableCell>{m.city}</TableCell>
+                <TableCell>{m.state}</TableCell>
+                <TableCell>{m.lat}</TableCell>
+                <TableCell>{m.lng}</TableCell>
               </TableRow>
             )
           })}

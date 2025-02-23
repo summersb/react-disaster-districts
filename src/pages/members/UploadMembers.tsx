@@ -10,6 +10,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import ImportDirectoryList from './ImportDirectoryList'
 import { useForm } from 'react-hook-form'
 import { parseData } from './process.ts'
+import UploadPdf from '@/pages/members/UploadPdf.tsx'
+import UploadCsv from '@/pages/members/UploadCsv.tsx'
 
 type FormType = {
   data: string
@@ -19,66 +21,17 @@ type FormType = {
 const UploadMembers = () => {
   const queryClient = useQueryClient()
   const form = useForm<FormType>()
-  const [file, setFile] = useState()
   const [members, setMembers] = useState<Member[]>()
-
-  const fileReader = new FileReader()
 
   const { data: dbMemberList } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
-
-  const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setFile(e.target.files[0])
-  }
 
   const onSubmit = (data: FormType) => {
     const parsedPersons = parseData(data.data)
     setMembers(parsedPersons as Member[])
     form.setValue('people', parsedPersons)
-  }
-
-  const csvFileToArray = (str: string) => {
-    const csvRows = str.slice(str.indexOf('\n') + 1).split('\n')
-
-    const array: Member[] = csvRows.map((i) => {
-      const values = i.split(';')
-      const member: Member = {
-        id: '0',
-        familyName: values[0],
-        name: values[1],
-        formattedAddress: values[2],
-        address1: values[3],
-        address2: values[4],
-        city: values[5],
-        state: values[6],
-        postalCode: Number(values[7]),
-        phone: values[8],
-        lat: Number(values[9]),
-        lng: Number(values[10])
-      }
-      return member
-    })
-
-    setMembers(array)
-  }
-
-  const handleOnSubmit = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault()
-
-    if (file) {
-      fileReader.onload = function(event) {
-        const text = event.target?.result
-        if (text) {
-          csvFileToArray(text as string)
-        }
-      }
-
-      fileReader.readAsText(file)
-    }
   }
 
   // compare data with members
@@ -88,19 +41,19 @@ const UploadMembers = () => {
     updated: Member
   }
 
-  const newMembers: Member[] = []
-  const existingMembers: Member[] = []
+  let newMembers: Member[] = []
+  //  const existingMembers: Member[] = []
   const removedMembers: Member[] = []
   const changedMembers: Changed[] = []
 
-  if (members && dbMemberList) {
+  if (members && members.length > 0 && dbMemberList) {
     members.forEach((m: Member) => {
       const found = dbMemberList.find((old) => {
         return old.familyName === m.familyName && old.name === m.name
       })
       if (found) {
         if (found.address1 === m.address1) {
-          existingMembers.push(m)
+          //        existingMembers.push(m)
         } else {
           changedMembers.push({ old: found, updated: m })
         }
@@ -112,7 +65,9 @@ const UploadMembers = () => {
     })
     dbMemberList.forEach((dbMember) => {
       const found = members.find(
-        (uploadedMember) => uploadedMember.familyName === dbMember.familyName && uploadedMember.name === dbMember.name
+        (uploadedMember) =>
+          uploadedMember.familyName === dbMember.familyName &&
+          uploadedMember.name === dbMember.name,
       )
       if (!found) {
         removedMembers.push(dbMember)
@@ -122,45 +77,45 @@ const UploadMembers = () => {
 
   const insertNewMembers = () => {
     const updateList = dbMemberList ?? []
-    newMembers?.forEach(m => {
-      console.log('Saving', m)
+    newMembers?.forEach((m) => {
       updateList.push(m)
-      saveMemberList(updateList)
-        .catch(err => {
-          console.error(err, m)
-        })
+      saveMemberList(updateList).catch((err) => {
+        console.error(err, m)
+      })
     })
     queryClient.invalidateQueries({ queryKey: ['members'] })
+    newMembers = []
     newMembers.length = 0
   }
 
   const deleteMembers = () => {
     const updateList: Member[] = dbMemberList ?? []
-    const ids = removedMembers.map(m => m.id)
+    const ids = removedMembers.map((m) => m.id)
     console.log('Deleting', ids)
-    saveMemberList(updateList.filter((m: Member) => !ids.includes(m.id)))
-      .catch(err => {
+    saveMemberList(updateList.filter((m: Member) => !ids.includes(m.id))).catch(
+      (err) => {
         console.error(err, updateList, ids)
-      })
+      },
+    )
     queryClient.invalidateQueries({ queryKey: ['members'] })
     newMembers.length = 0
     removedMembers.length = 0
   }
 
-  console.log('Matching members', existingMembers?.length ?? 0)
-  console.log('Changed members', changedMembers?.length ?? 0)
-
   return (
     <div className="p-4">
-      <div className="text-xl flex justify-around">Upload Member CSV</div>
+      <div className="text-xl flex justify-around">Upload Members</div>
       {(members?.length ?? 0) === 0 && (
-
         <div className="flex justify-start">
-          <Tabs defaultValue="web" className="w-full">
-            <TabsList className="grid w-fill grid-cols-2">
+          <Tabs defaultValue="pdf" className="w-full">
+            <TabsList className="grid w-fill grid-cols-3">
+              <TabsTrigger value="pdf">PDF</TabsTrigger>
               <TabsTrigger value="web">Web</TabsTrigger>
-              <TabsTrigger value="csv">CVS</TabsTrigger>
+              <TabsTrigger value="csv">CSV</TabsTrigger>
             </TabsList>
+            <TabsContent value="pdf">
+              <UploadPdf setMembers={setMembers} />
+            </TabsContent>
             <TabsContent value="web">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
@@ -170,53 +125,71 @@ const UploadMembers = () => {
               </Form>
             </TabsContent>
             <TabsContent value="csv">
-              <form>
-                <input
-                  type={'file'}
-                  id={'csvFileInput'}
-                  accept={'.csv'}
-                  onChange={handleOnChange}
-                />
-
-                <button
-                  className="p-2 mr-4 rounded outline outline-offset-2"
-                  onClick={(e) => {
-                    handleOnSubmit(e)
-                  }}
-                >
-                  IMPORT CSV
-                </button>
-              </form>
+              <UploadCsv setMembers={setMembers} />
             </TabsContent>
           </Tabs>
         </div>
       )}
-      {(newMembers.length ?? 0) > 0 && (
-        <>
-          New members
-          <UploadMembersDetail members={newMembers} />
-          <Button onClick={insertNewMembers}
-                  className="p-2 mr-4 rounded outline outline-offset-2">Insert</Button>
-        </>
+      {(newMembers?.length > 0 ||
+        changedMembers?.length > 0 ||
+        deleteMembers?.length > 0) && (
+        <Tabs defaultValue="new" className="w-full mt-10 mb-10">
+          <TabsList className="grid w-fill grid-cols-3">
+            <TabsTrigger value="new">New Members</TabsTrigger>
+            <TabsTrigger value="update">Changed Members</TabsTrigger>
+            <TabsTrigger value="delete">Deleted Members</TabsTrigger>
+          </TabsList>
+          <TabsContent value="new">
+            {(newMembers.length ?? 0) > 0 && (
+              <>
+                New members
+                <UploadMembersDetail members={newMembers} />
+                <Button
+                  onClick={insertNewMembers}
+                  className="p-2 mr-4 rounded outline outline-offset-2"
+                >
+                  Insert
+                </Button>
+              </>
+            )}
+          </TabsContent>
+          <TabsContent value="update">
+            {(changedMembers.length ?? 0) > 0 && (
+              <>
+                Changed Members
+                <MembersUpdate members={changedMembers} />
+                <Button
+                  onClick={insertNewMembers}
+                  className="p-2 mr-4 rounded outline outline-offset-2"
+                >
+                  Update
+                </Button>
+              </>
+            )}
+          </TabsContent>
+          <TabsContent value="delete">
+            {(removedMembers.length ?? 0) > 0 && (
+              <>
+                Removed Members
+                <UploadMembersDetail members={removedMembers} />
+                <Button
+                  onClick={deleteMembers}
+                  className="p-2 mr-4 rounded outline outline-offset-2"
+                >
+                  Delete
+                </Button>
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
       )}
-      {(changedMembers.length ?? 0) > 0 && (
-        <>
-          Changed Members
-          <MembersUpdate members={changedMembers} />
-          <Button onClick={insertNewMembers}
-                  className="p-2 mr-4 rounded outline outline-offset-2">Update</Button>
-        </>
-      )}
-      {(removedMembers.length ?? 0) > 0 && (
-        <>
-          Removed Members
-          <UploadMembersDetail members={removedMembers} />
-          <Button onClick={deleteMembers}
-                  className="p-2 mr-4 rounded outline outline-offset-2">Delete</Button>
-        </>)}
       {(members?.length ?? 0) > 0 && (
-        <Button onClick={() => setMembers([])}
-                className="p-2 mr-4 rounded outline outline-offset-2">Cancel</Button>
+        <Button
+          onClick={() => setMembers([])}
+          className="p-2 mr-4 rounded outline outline-offset-2"
+        >
+          Cancel
+        </Button>
       )}
     </div>
   )

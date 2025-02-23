@@ -7,16 +7,19 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@/components/ui/table'
 import { Link, useNavigate } from 'react-router-dom'
 import CsvDownloader from 'react-csv-downloader'
 import { FilePenLine, Trash2 } from 'lucide-react'
 import {
-  Dialog, DialogClose,
-  DialogContent, DialogDescription, DialogFooter,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from '@/components/ui/dialog.tsx'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
@@ -29,24 +32,24 @@ const MemberList = () => {
   const navigate = useNavigate()
   const { data } = useQuery({
     queryKey: ['members'],
-    queryFn: getMemberList
+    queryFn: getMemberList,
   })
 
   const { data: districts } = useQuery({
     queryKey: ['districts'],
-    queryFn: getDistrictList
+    queryFn: getDistrictList,
   })
 
   const deleteMembe = () => {
     if (id) {
-      deleteMember(id).then(() => {
-        setOpen(false)
-        queryClient.invalidateQueries({ queryKey: ['members'] })
-      })
-        .catch(e => {
+      deleteMember(id)
+        .then(() => {
+          setOpen(false)
+          queryClient.invalidateQueries({ queryKey: ['members'] })
+        })
+        .catch((e) => {
           setOpen(false)
           alert(e.message)
-
         })
     }
   }
@@ -58,11 +61,11 @@ const MemberList = () => {
   const columns = [
     {
       id: 'familyName',
-      displayName: 'Surname'
+      displayName: 'Surname',
     },
     {
       id: 'name',
-      displayName: 'Name'
+      displayName: 'Name',
     },
     { id: 'formattedAddress', displayName: 'Formatted Address' },
     { id: 'address1', displayName: 'Address1' },
@@ -73,12 +76,12 @@ const MemberList = () => {
     { id: 'phone', displayName: 'Phone' },
     {
       id: 'lat',
-      displayName: 'Latitude'
+      displayName: 'Latitude',
     },
     {
       id: 'lng',
-      displayName: 'Longitude'
-    }
+      displayName: 'Longitude',
+    },
   ]
   return (
     <>
@@ -115,40 +118,60 @@ const MemberList = () => {
         </TableHeader>
         <TableBody>
           {data &&
-            data.sort((m1, m2) => {
-              if (m1.familyName.toLowerCase() < m2.familyName.toLowerCase()) {
-                return -1
-              }
-              if (m1.familyName.toLowerCase() > m2.familyName.toLowerCase()) {
-                return 1
-              }
-              return 0
-            }).map((m) => {
-              const district = districts?.find(d => d.members.includes(m.id))
-              const districtName = district?.name
-              return (
-                <TableRow key={m.id}
-                          className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                  <TableCell><Link to={`/editmember/${m.id}`}><FilePenLine /></Link></TableCell>
-                  <TableCell onClick={() => districtClicked(district)}>{districtName}</TableCell>
-                  <TableCell>{m.familyName}</TableCell>
-                  <TableCell>{m.name}</TableCell>
-                  <TableCell>{m.formattedAddress}</TableCell>
-                  <TableCell>{m.address1}</TableCell>
-                  <TableCell>{m.address2}</TableCell>
-                  <TableCell>{m.city}</TableCell>
-                  <TableCell>{m.state}</TableCell>
-                  <TableCell>{m.postalCode}</TableCell>
-                  <TableCell>{m.phone}</TableCell>
-                  <TableCell>{m.lat}</TableCell>
-                  <TableCell>{m.lng}</TableCell>
-                  <TableCell><Trash2 onClick={() => {
-                    setId(m.id)
-                    setOpen(true)
-                  }} /></TableCell>
-                </TableRow>
-              )
-            })}
+            data
+              .sort((m1, m2) => {
+                if (
+                  m1.familyName?.toLowerCase() < m2.familyName?.toLowerCase()
+                ) {
+                  return -1
+                }
+                if (
+                  m1.familyName?.toLowerCase() > m2.familyName?.toLowerCase()
+                ) {
+                  return 1
+                }
+                return 0
+              })
+              .map((m) => {
+                const district = districts?.find((d) =>
+                  d.members.includes(m.id),
+                )
+                const districtName = district?.name
+                return (
+                  <TableRow
+                    key={m.id}
+                    className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                  >
+                    <TableCell>
+                      <Link to={`/editmember/${m.id}`}>
+                        <FilePenLine />
+                      </Link>
+                    </TableCell>
+                    <TableCell onClick={() => districtClicked(district)}>
+                      {districtName}
+                    </TableCell>
+                    <TableCell>{m.familyName}</TableCell>
+                    <TableCell>{m.name}</TableCell>
+                    <TableCell>{m.formattedAddress}</TableCell>
+                    <TableCell>{m.address1}</TableCell>
+                    <TableCell>{m.address2}</TableCell>
+                    <TableCell>{m.city}</TableCell>
+                    <TableCell>{m.state}</TableCell>
+                    <TableCell>{m.postalCode}</TableCell>
+                    <TableCell>{m.phone}</TableCell>
+                    <TableCell>{m.lat}</TableCell>
+                    <TableCell>{m.lng}</TableCell>
+                    <TableCell>
+                      <Trash2
+                        onClick={() => {
+                          setId(m.id)
+                          setOpen(true)
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
         </TableBody>
       </Table>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -156,16 +179,25 @@ const MemberList = () => {
           <DialogHeader>
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete this member.
+              This action cannot be undone. This will permanently delete this
+              member.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-start">
             <DialogClose asChild>
               <>
-                <Button type="button" variant="destructive" onClick={() => deleteMembe()}>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => deleteMembe()}
+                >
                   Delete
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setOpen(false)}
+                >
                   Cancel
                 </Button>
               </>

@@ -34,6 +34,7 @@
     "haversine": "^1.1.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.340.0",
+    "pdfjs-dist": "^4.10.38",
     "react": "^18.3.1",
     "react-csv-downloader": "^3.1.0",
     "react-dom": "^18.3.1",
