@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
 import type { Member } from '@/type'
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import Paper from '@/components/styled/Paper'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker
 
@@ -136,26 +137,53 @@ const UploadPdf = ({ setMembers }: UploadPdfProps): React.ReactElement => {
   }
 
   return (
-    <div>
-      <div className="text-xl flex justify-around m-10">Upload PDF</div>
-      <form>
-        <input
-          type={'file'}
-          id={'pdfFileInput'}
-          accept={'.pdf'}
-          onChange={handleOnChangePdf}
-        />
-
-        <button
-          className="p-2 mr-4 rounded outline outline-offset-2"
-          onClick={(e) => {
-            handleOnSubmitPdf(e)
-          }}
-        >
-          IMPORT PDF
-        </button>
-      </form>
-    </div>
+    <>
+      <div className="text-xl flex justify-center m-10">Upload PDF</div>
+      <div className="flex">
+        <Paper width="w-1/2">
+          <ul className="mb-6">
+            <li>
+              From{' '}
+              <a
+                href="https://directory.churchofjesuschrist.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:underline"
+              >
+                https://directory.churchofjesuschrist.org
+              </a>
+            </li>
+            <li>Print your wards member list</li>
+            <li>Select "Full Address" and check "Show Latitude/Longitude"</li>
+            <li>Then print to a file and upload that file</li>
+          </ul>
+          <form>
+            <input
+              type="file"
+              id="pdfFileInput"
+              accept=".pdf"
+              onChange={handleOnChangePdf}
+              className="mb-4 p-2 border rounded-md bg-gray-700 text-white"
+            />
+            <button
+              className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              onClick={(e) => {
+                handleOnSubmitPdf(e)
+              }}
+            >
+              IMPORT PDF
+            </button>
+          </form>
+        </Paper>
+        <div className="w-1/2 p-4">
+          <img
+            src="/images/print-ward.png"
+            alt="Show how to print PDF report"
+            className="h-[600px] w-auto object-contain"
+          />
+        </div>
+      </div>
+    </>
   )
 }
 

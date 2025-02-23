@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { Member } from '@/type'
+import Paper from '@/components/styled/Paper.tsx'
 
 type UploadCsvProps = {
   setMembers: (members: Member[]) => void
@@ -55,26 +56,29 @@ const UploadCsv = ({ setMembers }: UploadCsvProps): React.ReactElement => {
     }
   }
   return (
-    <div>
+    <>
       <div className="text-xl flex justify-around m-10">Upload CSV</div>
-      <form>
-        <input
-          type={'file'}
-          id={'csvFileInput'}
-          accept={'.csv'}
-          onChange={handleOnChange}
-        />
+      <Paper>
+        <form>
+          <input
+            type="file"
+            id="csvFileInput"
+            accept=".csv"
+            onChange={handleOnChange}
+            className="mb-4 p-2 border rounded-md bg-gray-700 text-white"
+          />
 
-        <button
-          className="p-2 mr-4 rounded outline outline-offset-2"
-          onClick={(e) => {
-            handleOnSubmit(e)
-          }}
-        >
-          IMPORT CSV
-        </button>
-      </form>
-    </div>
+          <button
+            className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            onClick={(e) => {
+              handleOnSubmit(e)
+            }}
+          >
+            IMPORT CSV
+          </button>
+        </form>
+      </Paper>
+    </>
   )
 }
 

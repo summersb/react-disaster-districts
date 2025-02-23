@@ -106,9 +106,7 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
     })
   }
 
-  function getGroupIcon(district: District): L.Icon {
-    const color = district.color
-
+  function getGroupIcon(): L.Icon {
     return new L.Icon({
       iconUrl: `/images/Group.svg`,
       iconSize: [50, 80], // size of the icon
@@ -175,7 +173,7 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
           <Marker
             key={d.id}
             position={[avgLat, avgLng]}
-            icon={getGroupIcon(d)}
+            icon={getGroupIcon()}
             eventHandlers={{ click: () => districtClicked(d) }}
           >
             <Tooltip opacity={1} direction="right" offset={[0, 20]} permanent>
