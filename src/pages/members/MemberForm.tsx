@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useFormContext } from 'react-hook-form'
+import { Textarea } from '@/components/ui/textarea.tsx'
 
 const MemberForm = () => {
   const { control } = useFormContext()
@@ -149,7 +150,11 @@ const MemberForm = () => {
           <FormItem>
             <FormLabel>Notes</FormLabel>
             <FormControl>
-              <Input placeholder="Additional info" {...field} />
+              <Textarea
+                placeholder="Additional information"
+                rows={5}
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
