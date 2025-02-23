@@ -1,5 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getMemberList, deleteMember, getDistrictList } from '@/api'
+import {
+  getMemberList,
+  deleteMember as deleteMemberFromDb,
+  getDistrictList,
+} from '@/api'
 import {
   Table,
   TableBody,
@@ -10,7 +14,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Link, useNavigate } from 'react-router-dom'
-import CsvDownloader from 'react-csv-downloader'
 import { FilePenLine, Trash2 } from 'lucide-react'
 import {
   Dialog,
@@ -21,11 +24,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog.tsx'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
-import type { District } from '@/type'
+import type { DistrictDbType } from '@/type'
+import { Input } from '@/components/ui/input.tsx'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 const MemberList = () => {
+  const [filter, setFilter] = useState<string>()
+  const [showNoDistrict, setshowNoDistrict] = useState<boolean>(false)
+  const [showNoPos, setShowNoPos] = useState<boolean>(false)
   const [open, setOpen] = useState(false)
   const [id, setId] = useState<string>()
   const queryClient = useQueryClient()
@@ -40,9 +48,9 @@ const MemberList = () => {
     queryFn: getDistrictList,
   })
 
-  const deleteMembe = () => {
+  const deleteMember = () => {
     if (id) {
-      deleteMember(id)
+      deleteMemberFromDb(id)
         .then(() => {
           setOpen(false)
           queryClient.invalidateQueries({ queryKey: ['members'] })
@@ -54,48 +62,35 @@ const MemberList = () => {
     }
   }
 
-  const districtClicked = (district: District) => {
-    navigate(`/district/${district.id}`)
+  const districtClicked = (district: DistrictDbType) => {
+    if (district) {
+      navigate(`/district/${district.id}`)
+    }
   }
 
-  const columns = [
-    {
-      id: 'familyName',
-      displayName: 'Surname',
-    },
-    {
-      id: 'name',
-      displayName: 'Name',
-    },
-    { id: 'formattedAddress', displayName: 'Formatted Address' },
-    { id: 'address1', displayName: 'Address1' },
-    { id: 'address2', displayName: 'Address2' },
-    { id: 'city', displayName: 'City' },
-    { id: 'state', displayName: 'State' },
-    { id: 'postalCode', displayName: 'Postal Code' },
-    { id: 'phone', displayName: 'Phone' },
-    {
-      id: 'lat',
-      displayName: 'Latitude',
-    },
-    {
-      id: 'lng',
-      displayName: 'Longitude',
-    },
-  ]
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter(event.target.value)
+  }
+
   return (
     <>
       <div className="text-xl flex justify-around">Members</div>
-      <div className="flex justify-end">
-        <CsvDownloader
-          filename="memberlist"
-          separator=";"
-          columns={columns}
-          datas={data ?? []}
-          text="Download CSV"
-          className="p-2 mr-4 rounded outline outline-offset-2"
-        />
+      <div className="flex items-center">
+        <span className="p-2 whitespace-nowrap">Filter by surname</span>
+        <Input onChange={onChange}></Input>
       </div>
+      <StyledButton
+        isPressed={showNoPos}
+        onClick={() => setShowNoPos(!showNoPos)}
+      >
+        Show missing lat/lng
+      </StyledButton>
+      <StyledButton
+        isPressed={showNoDistrict}
+        onClick={() => setshowNoDistrict(!showNoDistrict)}
+      >
+        Show no district
+      </StyledButton>
       <Table>
         <TableCaption>List of members</TableCaption>
         <TableHeader>
@@ -119,6 +114,17 @@ const MemberList = () => {
         <TableBody>
           {data &&
             data
+              .filter((m) =>
+                m.familyName
+                  .toLowerCase()
+                  .includes(filter?.toLowerCase() ?? ''),
+              )
+              .filter((m) => (showNoPos ? m.lat == null : true))
+              .filter((m) =>
+                showNoDistrict
+                  ? districts?.find((d) => d.members?.includes(m.id)) == null
+                  : true,
+              )
               .sort((m1, m2) => {
                 if (
                   m1.familyName?.toLowerCase() < m2.familyName?.toLowerCase()
@@ -134,9 +140,9 @@ const MemberList = () => {
               })
               .map((m) => {
                 const district = districts?.find((d) =>
-                  d.members.includes(m.id),
+                  d.members?.includes(m.id),
                 )
-                const districtName = district?.name
+                const districtName = district?.name ?? ''
                 return (
                   <TableRow
                     key={m.id}
@@ -189,7 +195,7 @@ const MemberList = () => {
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={() => deleteMembe()}
+                  onClick={() => deleteMember()}
                 >
                   Delete
                 </Button>

@@ -142,6 +142,19 @@ const MemberForm = () => {
           </FormItem>
         )}
       />
+      <FormField
+        control={control}
+        name="notes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Notes</FormLabel>
+            <FormControl>
+              <Input placeholder="Additional info" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   )
 }

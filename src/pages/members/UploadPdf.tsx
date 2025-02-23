@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist'
 import type { Member } from '@/type'
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import Paper from '@/components/styled/Paper'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker
 
@@ -165,14 +166,7 @@ const UploadPdf = ({ setMembers }: UploadPdfProps): React.ReactElement => {
               onChange={handleOnChangePdf}
               className="mb-4 p-2 border rounded-md bg-gray-700 text-white"
             />
-            <button
-              className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              onClick={(e) => {
-                handleOnSubmitPdf(e)
-              }}
-            >
-              IMPORT PDF
-            </button>
+            <StyledButton onClick={handleOnSubmitPdf}>IMPORT PDF</StyledButton>
           </form>
         </Paper>
         <div className="w-1/2 p-4">

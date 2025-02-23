@@ -45,7 +45,9 @@ const Sidebar = (): React.ReactElement => {
         <img alt="logo" src="/favicon.ico" width={24} height={24} /> Disaster
         Districts
       </div>
-      <div className="flex flex-row">{wardDoc?.wardName}</div>
+      <div className="flex flex-row">
+        <Link to="/">{wardDoc?.wardName}</Link>
+      </div>
       <div className="flex flex-row">
         <School />
         <Link to="/districts">Districts</Link>

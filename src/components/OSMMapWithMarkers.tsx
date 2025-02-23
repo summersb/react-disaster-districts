@@ -7,21 +7,6 @@ import haversine from 'haversine'
 import { useNavigate } from 'react-router-dom'
 import MemberDisplayName from '@/components/MemberDisplayName.tsx'
 
-const convertDbDistrict = (
-  district: DistrictDbType,
-  members: Member[],
-): Promise<District> =>
-  district.map((db) => {
-    return {
-      id: db.id,
-      name: db.name,
-      leader: members?.find((m) => m.id == db.leaderId),
-      assistant: members?.find((m) => m.id == db.assistantId),
-      color: db.color,
-      members: members?.filter((m) => db.members?.includes(m.id)),
-    } as District
-  })
-
 type Position = {
   lat: number
   lng: number
@@ -34,7 +19,7 @@ function ChangeView(center: Position) {
 }
 
 type MapWithMarkersProps = {
-  districts: District[]
+  districts: DistrictDbType[]
   members: Member[]
   center?: Position
   markerClicked?: (member: Member) => void
@@ -62,7 +47,7 @@ const deClutter = (members: Member[]): Member[] => {
     if (toClose) {
       return {
         ...m,
-        lat: m.lat + 0.0005,
+        lat: (m?.lat ?? 0) + 0.0005,
       }
     }
     return m
@@ -119,11 +104,11 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
   }
 
   const findCenter = (memberList: Member[]) => {
-    const lats = memberList.map((m) => m.lat ?? 0)
-    const lngs = memberList.map((m) => m.lng ?? 0)
+    const latitudes = memberList.map((m) => m.lat ?? 0)
+    const longitudes = memberList.map((m) => m.lng ?? 0)
 
-    const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
-    const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
+    const avgLat = latitudes.reduce((a, b) => a + b, 0) / latitudes.length
+    const avgLng = longitudes.reduce((a, b) => a + b, 0) / longitudes.length
     return { lat: avgLat, lng: avgLng }
   }
 
@@ -161,18 +146,14 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
       {props.districts?.map((d) => {
         // get average lat/lng for a district
         const distMembers = d.members
-          ?.map((mem) => props.members?.find((m) => m.id === mem.id))
+          ?.map((mem) => props.members?.find((m) => m.id === mem))
           .filter((m) => m != null)
         if (distMembers == null || distMembers?.length == 0) return null
-        const lats = distMembers.map((m) => m.lat ?? 0)
-        const lngs = distMembers.map((m) => m.lng ?? 0)
-
-        const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
-        const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
+        const center = findCenter(distMembers)
         return (
           <Marker
             key={d.id}
-            position={[avgLat, avgLng]}
+            position={[center.lat, center.lng]}
             icon={getGroupIcon()}
             eventHandlers={{ click: () => districtClicked(d) }}
           >

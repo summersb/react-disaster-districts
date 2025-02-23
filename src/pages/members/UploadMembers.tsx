@@ -5,20 +5,20 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import UploadMembersDetail from './UploadMembersDetail'
 import MembersUpdate from './MembersUpdate'
-import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import ImportDirectoryList from './ImportDirectoryList'
 import { useForm } from 'react-hook-form'
 import { parseData } from './process.ts'
 import UploadPdf from '@/pages/members/UploadPdf.tsx'
 import UploadCsv from '@/pages/members/UploadCsv.tsx'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 type FormType = {
   data: string
   people?: Member[]
 }
 
-const UploadMembers = () => {
+const UploadMembers = (): React.ReactElement => {
   const queryClient = useQueryClient()
   const form = useForm<FormType>()
   const [members, setMembers] = useState<Member[]>()
@@ -120,7 +120,7 @@ const UploadMembers = () => {
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
                   <ImportDirectoryList />
-                  <Button type="submit">Process</Button>
+                  <StyledButton type="submit">Process</StyledButton>
                 </form>
               </Form>
             </TabsContent>
@@ -144,12 +144,7 @@ const UploadMembers = () => {
               <>
                 New members
                 <UploadMembersDetail members={newMembers} />
-                <Button
-                  onClick={insertNewMembers}
-                  className="p-2 mr-4 rounded outline outline-offset-2"
-                >
-                  Insert
-                </Button>
+                <StyledButton onClick={insertNewMembers}>Insert</StyledButton>
               </>
             )}
           </TabsContent>
@@ -158,12 +153,7 @@ const UploadMembers = () => {
               <>
                 Changed Members
                 <MembersUpdate members={changedMembers} />
-                <Button
-                  onClick={insertNewMembers}
-                  className="p-2 mr-4 rounded outline outline-offset-2"
-                >
-                  Update
-                </Button>
+                <StyledButton onClick={insertNewMembers}>Update</StyledButton>
               </>
             )}
           </TabsContent>
@@ -172,24 +162,14 @@ const UploadMembers = () => {
               <>
                 Removed Members
                 <UploadMembersDetail members={removedMembers} />
-                <Button
-                  onClick={deleteMembers}
-                  className="p-2 mr-4 rounded outline outline-offset-2"
-                >
-                  Delete
-                </Button>
+                <StyledButton onClick={deleteMembers}>Delete</StyledButton>
               </>
             )}
           </TabsContent>
         </Tabs>
       )}
       {(members?.length ?? 0) > 0 && (
-        <Button
-          onClick={() => setMembers([])}
-          className="p-2 mr-4 rounded outline outline-offset-2"
-        >
-          Cancel
-        </Button>
+        <StyledButton onClick={() => setMembers([])}>Cancel</StyledButton>
       )}
     </div>
   )

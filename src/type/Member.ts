@@ -24,6 +24,7 @@ export const MemberSchema = z.object({
       z.number().optional(),
     )
     .optional(),
+  notes: z.string().optional(),
 })
 
 export type Member = z.infer<typeof MemberSchema> & BaseObject

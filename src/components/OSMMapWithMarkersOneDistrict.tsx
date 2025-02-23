@@ -30,27 +30,28 @@ const deClutter = (members: Member[]): Member[] => {
     return []
   }
 
-  const validLatLng = members.filter(m => m?.lat !== undefined && m?.lng !== undefined)
+  const validLatLng = members.filter(
+    (m) => m?.lat !== undefined && m?.lng !== undefined,
+  )
 
-  return validLatLng
-    .map(m => {
-      const start = { latitude: m.lat, longitude: m.lng }
+  return validLatLng.map((m) => {
+    const start = { latitude: m.lat, longitude: m.lng }
 
-      const toClose = validLatLng
-        .filter(mm => mm.id !== m.id)
-        .find(otherM => {
-          const end = { latitude: otherM.lat, longitude: otherM.lng }
-          const distance = haversine(start, end)
-          return distance < 0.01
-        })
-      if (toClose) {
-        return {
-          ...m,
-          lat: m.lat + .0005
-        }
+    const toClose = validLatLng
+      .filter((mm) => mm.id !== m.id)
+      .find((otherM) => {
+        const end = { latitude: otherM.lat, longitude: otherM.lng }
+        const distance = haversine(start, end)
+        return distance < 0.01
+      })
+    if (toClose) {
+      return {
+        ...m,
+        lat: m.lat + 0.0005,
       }
-      return m
-    })
+    }
+    return m
+  })
 }
 
 const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
@@ -72,13 +73,11 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
       popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
       shadowUrl:
         'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-      shadowSize: [41, 41]
+      shadowSize: [41, 41],
     })
   }
 
-  function getGroupIcon(district: District): L.Icon {
-    const color = district.color
-
+  function getGroupIcon(): L.Icon {
     return new L.Icon({
       iconUrl: `/images/Group.svg`,
       iconSize: [50, 80], // size of the icon
@@ -86,13 +85,13 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
       popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
       shadowUrl:
         'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-      shadowSize: [41, 41]
+      shadowSize: [41, 41],
     })
   }
 
   const findCenter = (memberList: Member[]) => {
-    const lats = memberList.map(m => m?.lat ?? 0)
-    const lngs = memberList.map(m => m?.lng ?? 0)
+    const lats = memberList.map((m) => m?.lat ?? 0)
+    const lngs = memberList.map((m) => m?.lng ?? 0)
 
     const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
     const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
@@ -100,20 +99,6 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
   }
 
   const center = findCenter(props.district.members ?? [])
-
-  // get average lat/lng for a district
-  const distMembers = props.district.members?.filter(m => m != null)
-  const validLatLngs = distMembers.filter(m => m.lat !== undefined && m.lng !== undefined)
-
-  let avgLat, avgLng
-  if (validLatLngs.length > 0) {
-    // get average lat/lng for a district
-    const lats = distMembers.map(m => m.lat)
-    const lngs = distMembers.map(m => m.lng)
-
-    avgLat = lats.reduce((a, b) => a + b, 0) / lats.length
-    avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length
-  }
 
   return (
     <MapContainer
@@ -133,16 +118,19 @@ const OSMMapWithMarkers = (props: MapWithMarkersProps): React.ReactElement => {
           position={[member.lat ?? 0, member.lng ?? 0]}
           icon={getMemberIcon(member)}
         >
-          <Tooltip direction="right" offset={[0, 20]} opacity={.5}
-                   permanent><MemberDisplayName member={member} /></Tooltip>
+          <Tooltip direction="right" offset={[0, 20]} opacity={0.5} permanent>
+            <MemberDisplayName member={member} />
+          </Tooltip>
         </Marker>
       ))}
       {props.showDistrictMarker && (
-        <Marker key={props.district.id} position={[avgLat, avgLng]} icon={getGroupIcon(props.district)}>
-          <Tooltip opacity={1}
-                   direction="right"
-                   offset={[0, 20]}
-                   permanent>{props.district.name}
+        <Marker
+          key={props.district.id}
+          position={[center.lat, center.lng]}
+          icon={getGroupIcon()}
+        >
+          <Tooltip opacity={1} direction="right" offset={[0, 20]} permanent>
+            {props.district.name}
           </Tooltip>
           {props.bounds && props.bounds}
         </Marker>

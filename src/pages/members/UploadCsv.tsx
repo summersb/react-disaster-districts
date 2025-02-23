@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import type { Member } from '@/type'
 import Paper from '@/components/styled/Paper.tsx'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 type UploadCsvProps = {
   setMembers: (members: Member[]) => void
@@ -67,15 +68,7 @@ const UploadCsv = ({ setMembers }: UploadCsvProps): React.ReactElement => {
             onChange={handleOnChange}
             className="mb-4 p-2 border rounded-md bg-gray-700 text-white"
           />
-
-          <button
-            className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            onClick={(e) => {
-              handleOnSubmit(e)
-            }}
-          >
-            IMPORT CSV
-          </button>
+          <StyledButton onClick={handleOnSubmit}>IMPORT CSV</StyledButton>
         </form>
       </Paper>
     </>

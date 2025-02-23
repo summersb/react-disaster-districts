@@ -4,12 +4,12 @@ import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form } from '@/components/ui/form'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
 import { getMember, saveMember } from '@/api'
 import { MemberSchema } from '@/type'
 import type { Member } from '@/type'
 import MemberForm from './MemberForm'
 import { getGeo } from '@/pages/members/process.ts'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 const EditMember = () => {
   const { memberId } = useParams()
@@ -54,23 +54,16 @@ const EditMember = () => {
           className="w-2/3 space-y-6"
         >
           <MemberForm />
-          <Button
-            variant="outline"
-            disabled={form.formState.isSubmitting}
-            type="submit"
-          >
-            Save Member
-          </Button>
+          <StyledButton type="submit" disabled={form.formState.isSubmitting}>
+            Save
+          </StyledButton>
           <Link to="/members">
-            <Button variant="outline" disabled={form.formState.isSubmitting}>
+            <StyledButton disabled={form.formState.isSubmitting}>
               Cancel
-            </Button>
+            </StyledButton>
           </Link>
         </form>
       </Form>
-      <Link to="/members">
-        <Button>Back</Button>
-      </Link>
     </>
   )
 }
