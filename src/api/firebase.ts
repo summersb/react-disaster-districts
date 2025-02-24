@@ -1,14 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
-import {
-  connectAuthEmulator,
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-} from 'firebase/auth'
-//import { getAnalytics } from 'firebase/analytics'
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
+import { getAuth, signOut } from 'firebase/auth'
+import { getAnalytics } from 'firebase/analytics'
+import { getFirestore } from 'firebase/firestore'
 //import { ReCaptchaV3Provider, initializeAppCheck } from 'firebase/app-check'
 
 const firebaseConfig = {
@@ -24,27 +18,27 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
 const auth = getAuth()
-if (import.meta.env.MODE === 'development') {
-  connectAuthEmulator(auth, 'http://localhost:9099')
-}
-//const analytics = getAnalytics(app)
-const provider = new GoogleAuthProvider()
-export const signInWithGoogle = async () => {
-  try {
-    const result = await signInWithPopup(auth, provider)
-    console.log('User signed in ', result.user)
-  } catch (error) {
-    console.error('Error signing in', error)
-  }
-}
+//if (import.meta.env.MODE === 'development') {
+//  connectAuthEmulator(auth, 'http://localhost:9099')
+//}
+const analytics = getAnalytics(app)
+//const provider = new GoogleAuthProvider()
+//export const signInWithGoogle = async () => {
+//  try {
+//    const result = await signInWithPopup(auth, provider)
+//    console.log('User signed in ', result.user)
+//  } catch (error) {
+//    console.error('Error signing in', error)
+//  }
+//}
 
 const db = getFirestore(app)
-if (import.meta.env.MODE === 'development') {
-  connectFirestoreEmulator(db, 'localhost', 8080)
-}
+//if (import.meta.env.MODE === 'development') {
+//  connectFirestoreEmulator(db, 'localhost', 8080)
+//}
 //const appCheck = initializeAppCheck(app, {
 //  provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
 //  isTokenAutoRefreshEnabled: true,
 //})
 
-export { auth, db, app, signOut, getAuth }
+export { auth, db, app, signOut, getAuth, analytics }

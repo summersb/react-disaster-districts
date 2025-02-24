@@ -2,7 +2,8 @@ export type UserRoles = {
   users: {
     [name: string]: {
       role: string
-      email: string
+      email?: string
+      name?: string
     }
   }
 }

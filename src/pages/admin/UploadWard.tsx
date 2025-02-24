@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button.tsx'
 import {
   createWard,
   getWardList,
@@ -11,6 +10,7 @@ import { saveDistrictList } from '@/api/districtApi.ts'
 import useAuth from '@/hooks/useAuth.tsx'
 import { DistrictDbType, Member } from '@/type'
 import { UserRoles } from '@/type/User.ts'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 type WardDoc = {
   id: string
@@ -38,14 +38,24 @@ const UploadWard = (): React.ReactElement => {
       fileReader.onload = async function (event) {
         const text = event.target?.result
         if (text) {
-          const wardData: WardDoc = JSON.parse(text as string)
-          const wardList = await getWardList()
-          await saveWardList([...(wardList || []), { wardName: wardData.name }])
-            .then(() => createWard(wardData.name, user))
-            .then(() => savePermissions(wardData.permissions))
-            .then(() => saveMemberList(wardData.members))
-            .then(() => saveDistrictList(wardData.districts))
-            .catch((err) => console.log(err))
+          try {
+            const wardData: WardDoc = JSON.parse(text as string)
+            const wardList = await getWardList()
+            await saveWardList([
+              ...(wardList || []),
+              { wardName: wardData.name },
+            ])
+            await createWard(wardData.name, user)
+            console.log('Created ward', wardData.name)
+            await savePermissions(wardData.permissions)
+            console.log('Added permissions', wardData.permissions)
+            await saveMemberList(wardData.members)
+            console.log('Added members', wardData.members)
+            await saveDistrictList(wardData.districts)
+            console.log('Added districts', wardData.districts)
+          } catch (e) {
+            console.error(e)
+          }
         }
       }
 
@@ -56,13 +66,14 @@ const UploadWard = (): React.ReactElement => {
   return (
     <form>
       <input
-        type={'file'}
-        id={'wardimport'}
-        accept={'.json'}
+        type="file"
+        id="wardimport"
+        accept=".json"
         onChange={handleOnChange}
+        className="mb-4 p-2 border rounded-md bg-gray-700 text-white"
       />
 
-      <Button onClick={handleOnSubmit}>Import Ward</Button>
+      <StyledButton onClick={handleOnSubmit}>Import Ward</StyledButton>
     </form>
   )
 }

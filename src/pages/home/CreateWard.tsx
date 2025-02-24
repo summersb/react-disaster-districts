@@ -8,13 +8,13 @@ import {
   FormMessage,
 } from '@/components/ui/form.tsx'
 import { Input } from '@/components/ui/input.tsx'
-import { Button } from '@/components/ui/button.tsx'
 import { WardConfig } from '@/type/Ward.ts'
 import { createWard, getWardList, saveWardList } from '@/api/wardApi.ts'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useLocalStorageState } from '@/hooks/useLocalStorageState.tsx'
 import useAuth from '@/hooks/useAuth.tsx'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 const CreateWard = (): React.ReactElement => {
   const { user } = useAuth()
@@ -62,9 +62,9 @@ const CreateWard = (): React.ReactElement => {
             />
           </div>
           <div className="mb-4">
-            <Button variant="outline" type="submit">
+            <StyledButton variant="outline" type="submit">
               Create
-            </Button>
+            </StyledButton>
           </div>
         </form>
       </Form>

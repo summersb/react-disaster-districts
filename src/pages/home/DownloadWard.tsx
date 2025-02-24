@@ -1,7 +1,7 @@
 import React from 'react'
 import { getPerms } from '@/api/wardApi.ts'
 import { getDistrictList, getMemberList } from '@/api'
-import { Button } from '@/components/ui/button.tsx'
+import StyledButton from '@/components/styled/StyledButton.tsx'
 
 export const DownloadWard = (): React.ReactElement => {
   const downloadWard = async () => {
@@ -28,7 +28,7 @@ export const DownloadWard = (): React.ReactElement => {
   }
   return (
     <div>
-      <Button onClick={downloadWard}>Download Ward</Button>
+      <StyledButton onClick={downloadWard}>Download Ward</StyledButton>
     </div>
   )
 }

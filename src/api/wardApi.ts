@@ -31,7 +31,6 @@ export const getWardList = async (): Promise<WardConfig[]> => {
 }
 
 export const saveWardList = async (wardList: WardConfig[]): Promise<void> => {
-  console.log('Saving ward list', wardList)
   const docRef = doc(db, `${topCollection}`, 'wardList')
   const wardDoc = { list: wardList } as WardDoc
   await setDoc(docRef, wardDoc)
