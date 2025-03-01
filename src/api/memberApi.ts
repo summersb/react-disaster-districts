@@ -7,20 +7,26 @@ import { getActiveWard } from '@/utils/ward.ts'
 const topCollection = import.meta.env.VITE_top_collection
 const memberListDocName = 'member_list'
 
-export const saveMemberList = async (members: Member[]): Promise<void> => {
+export const saveMemberList = async (
+  members: Member[],
+  wardName?: string,
+): Promise<void> => {
   const map = toMap(members)
-  return saveMemberMap(map)
+  if (wardName == null) {
+    wardName = getActiveWard().wardName
+  }
+  return saveMemberMap(wardName, map)
 }
 
 export const saveMemberMap = async (
+  wardName: string,
   members: Map<string, Partial<Member>>,
 ): Promise<void> => {
-  const wardDoc = getActiveWard().wardName
   const cleanMemberMap = filterNullUndefined(members)
   const holderObject: {
     [key: string]: Partial<Member>
   } = Object.fromEntries(Array.from(cleanMemberMap.entries()))
-  const wardCollection = collection(db, `${topCollection}/${wardDoc}/members`)
+  const wardCollection = collection(db, `${topCollection}/${wardName}/members`)
   await setDoc(doc(wardCollection, memberListDocName), holderObject)
 }
 
@@ -47,8 +53,9 @@ export const getMemberMap = async (): Promise<Map<string, Member>> => {
 
 export const saveMember = async (member: Partial<Member>): Promise<void> => {
   const map = await getMemberMap()
+  const wardDoc = getActiveWard().wardName
   map.set(member.id as string, member as Member)
-  return saveMemberMap(map)
+  return saveMemberMap(wardDoc, map)
 }
 
 export const getMember = async (id: string): Promise<Member> => {
@@ -57,7 +64,8 @@ export const getMember = async (id: string): Promise<Member> => {
 }
 
 export const deleteMember = async (id: string): Promise<void> => {
+  const wardDoc = getActiveWard().wardName
   const map = await getMemberMap()
   map.delete(id)
-  return saveMemberMap(map)
+  return saveMemberMap(wardDoc, map)
 }

@@ -11,6 +11,8 @@ import useAuth from '@/hooks/useAuth.tsx'
 import { DistrictDbType, Member } from '@/type'
 import { UserRoles } from '@/type/User.ts'
 import StyledButton from '@/components/styled/StyledButton.tsx'
+import { useLocalStorageState } from '@/hooks/useLocalStorageState.tsx'
+import { WardConfig } from '@/type/Ward.ts'
 
 type WardDoc = {
   id: string
@@ -24,6 +26,7 @@ const UploadWard = (): React.ReactElement => {
   const [file, setFile] = useState<File | null>()
   const { user } = useAuth()
   const fileReader = new FileReader()
+  const [, setActiveWard] = useLocalStorageState<WardConfig>('ward', undefined)
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0])
@@ -46,13 +49,14 @@ const UploadWard = (): React.ReactElement => {
               { wardName: wardData.name },
             ])
             await createWard(wardData.name, user)
+            setActiveWard({ wardName: wardData.name })
             console.log('Created ward', wardData.name)
-            await savePermissions(wardData.permissions)
+            await savePermissions(wardData.name, wardData.permissions)
             console.log('Added permissions', wardData.permissions)
-            await saveMemberList(wardData.members)
-            console.log('Added members', wardData.members)
-            await saveDistrictList(wardData.districts)
-            console.log('Added districts', wardData.districts)
+            const members = await saveMemberList(wardData.members)
+            console.log('Added members', wardData.members, members)
+            const dist = await saveDistrictList(wardData.districts)
+            console.log('Added districts', wardData.districts, dist)
           } catch (e) {
             console.error(e)
           }

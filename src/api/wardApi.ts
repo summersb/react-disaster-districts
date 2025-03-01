@@ -43,8 +43,10 @@ export const getPerms = async (): Promise<UserRoles> => {
   return permDoc.data() as UserRoles
 }
 
-export const savePermissions = async (data: UserRoles): Promise<void> => {
-  const wardName = getActiveWard().wardName
+export const savePermissions = async (
+  wardName: string,
+  data: UserRoles,
+): Promise<void> => {
   const wardDoc = doc(db, `${topCollection}`, wardName)
   setDoc(wardDoc, data)
 }
